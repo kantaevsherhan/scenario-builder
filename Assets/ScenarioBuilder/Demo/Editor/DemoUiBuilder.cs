@@ -34,7 +34,7 @@ namespace ScenarioBuilder.Demo.Editor
             GuidedTour tour = CreateTour(canvas, runner, new[]
             {
                 Stop(taskPanel.Root, "Список заданий",
-                    "Здесь все шаги смены. Синим выделены те, что нужно сделать сейчас, зелёным — выполненные, красным — ошибки."),
+                    "Здесь все шаги смены. Синие нужно сделать сейчас, зелёные выполнены, красные провалены."),
                 Stop(controlPanel, "Пульт управления",
                     "Кнопки и ползунок отправляют действия. Кнопка, которую ждёт текущий шаг, мигает синим."),
                 Stop(world.Player, "Это вы",
@@ -177,7 +177,7 @@ namespace ScenarioBuilder.Demo.Editor
             result.ShowResultsButton = UiFactory.Button("ShowResultsButton", panel.transform, "Показать результаты", UiFactory.AccentColor, 48);
             result.ShowResultsButton.gameObject.SetActive(false);
             UiFactory.Text("ControlsHint", panel.transform,
-                "Движение: WASD или стрелки. Кнопки и ползунок — на пульте справа.",
+                "Движение: WASD или стрелки. Кнопки и ползунок на пульте справа.",
                 14, UiFactory.MutedTextColor);
             return result;
         }
@@ -275,7 +275,7 @@ namespace ScenarioBuilder.Demo.Editor
             SerializedWiring.Set(minSource, "hint", "Передвиньте ползунок «Давление» влево до 0%.");
             UnityEventTools.AddVoidPersistentListener(pressure.ReachedMin, minSource.RaiseAction);
 
-            UiFactory.Text("PressureHint", parent, "100% — поднять давление, 0% — сбросить", 14, UiFactory.MutedTextColor);
+            UiFactory.Text("PressureHint", parent, "100%: поднять давление, 0%: сбросить", 14, UiFactory.MutedTextColor);
         }
 
         private static Button ActionButton(Transform parent, string name, string label, ActionDefinition action,
@@ -510,7 +510,7 @@ namespace ScenarioBuilder.Demo.Editor
             SectionHeader("Title", window, "НАСТРОЙКИ");
             Toggle tourToggle = UiFactory.Toggle("TourToggle", window, "Обучающий тур и подсказки по шагам");
             Toggle highlightToggle = UiFactory.Toggle("HighlightToggle", window, "Подсветка объектов текущего шага");
-            UiFactory.Text("Note", window, "Подсказки работают только в режимах, где они включены (в демо — в тренировке).",
+            UiFactory.Text("Note", window, "Подсказки работают только в режимах, где они включены (в демо это тренировка).",
                 14, UiFactory.MutedTextColor);
             UiFactory.Size(UiFactory.Rect("Spacer", window).gameObject, flexibleHeight: 1);
 

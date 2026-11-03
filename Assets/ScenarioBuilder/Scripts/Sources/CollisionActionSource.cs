@@ -7,7 +7,7 @@ namespace ScenarioBuilder.Sources
     [RequireComponent(typeof(Collider))]
     public sealed class CollisionActionSource : ScenarioActionSource
     {
-        [SerializeField, Tooltip("Тег объекта, столкновение с которым засчитывается. Пусто — любой объект.")]
+        [SerializeField, Tooltip("Тег объекта, столкновение с которым засчитывается. Если пусто, подходит любой объект.")]
         private string requiredTag = "Player";
 
         [SerializeField, Tooltip("Действие при столкновении.")]

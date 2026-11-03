@@ -161,7 +161,7 @@ namespace ScenarioBuilder.Core
         {
             if (!isFirstUse)
             {
-                Debug.LogWarning($"Шаг «{step.Id}» указан в режиме «{mode.DisplayName}» несколько раз — повтор пропущен.", mode);
+                Debug.LogWarning($"Шаг «{step.Id}» указан в режиме «{mode.DisplayName}» несколько раз, повтор пропущен.", mode);
             }
 
             return isFirstUse;

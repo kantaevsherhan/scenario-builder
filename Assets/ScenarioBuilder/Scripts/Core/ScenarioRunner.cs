@@ -18,14 +18,14 @@ namespace ScenarioBuilder.Core
         [SerializeField, Tooltip("Сценарий, который запускается в этой сцене.")]
         private ScenarioDefinition scenario;
 
-        [SerializeField, Tooltip("Режим при запуске сцены. Пусто — первый режим сценария.")]
+        [SerializeField, Tooltip("Режим, выбранный при запуске. Если не задан, берётся первый режим сценария.")]
         private ScenarioMode startMode;
 
         [SerializeField, Tooltip("Запускать сценарий сразу при старте сцены. Выключите, если прохождение начинается с кнопки (стартовый экран).")]
         private bool startOnPlay = true;
 
         [SerializeField, Tooltip("Анализаторы, доступные для оценки и повторной оценки. " +
-                                 "По окончании прохождения используется анализатор режима, а если он не задан — первый из списка.")]
+                                 "По окончании прохождения используется анализатор режима, а если он не задан, первый из списка.")]
         private List<ScenarioAnalyzer> analyzers = new();
 
         [SerializeField, Tooltip("Куда дополнительно пишется журнал: консоль, файл и т. д.")]

@@ -12,10 +12,10 @@ namespace ScenarioBuilder.Steps
         [SerializeField, Tooltip("Состояние сцены, которое проверяется в момент действия.")]
         private StateFlag flag;
 
-        [SerializeField, Tooltip("Включено — флаг должен быть установлен. Выключено — снят.")]
+        [SerializeField, Tooltip("Включено: флаг должен быть установлен. Выключено: снят.")]
         private bool mustBeSet = true;
 
-        [SerializeField, Tooltip("Сообщение при нарушении. Пусто — сформируется автоматически.")]
+        [SerializeField, Tooltip("Текст нарушения. Если пусто, он составится автоматически.")]
         private string violationMessage;
 
         public StateRequirement(StateFlag flag, bool mustBeSet, string violationMessage = "")
@@ -74,7 +74,7 @@ namespace ScenarioBuilder.Steps
         [SerializeField, Tooltip("Действие, которое во время шага считается ошибкой.")]
         private ActionDefinition action;
 
-        [SerializeField, Tooltip("Сообщение при нарушении. Пусто — сформируется автоматически.")]
+        [SerializeField, Tooltip("Текст нарушения. Если пусто, он составится автоматически.")]
         private string message;
 
         public ForbiddenAction(ActionDefinition action, string message = "")

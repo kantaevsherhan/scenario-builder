@@ -16,7 +16,7 @@ namespace ScenarioBuilder.Steps
         private List<RequiredAction> requiredActions = new();
 
         [SerializeField, Tooltip("Действие из списка, выполненное раньше своей очереди, считается нарушением. " +
-                                 "Если выключено — такое действие просто игнорируется.")]
+                                 "Если выключено, такое действие просто игнорируется.")]
         private bool wrongOrderIsViolation = true;
 
         [SerializeField, Tooltip("Действия, которые во время этого шага считаются ошибкой.")]

@@ -20,19 +20,19 @@ namespace ScenarioBuilder.Analysis
             var warnings = new List<string>();
             if (journal == null || journal.Entries.Count == 0)
             {
-                warnings.Add("Журнал пуст — оценивать нечего.");
+                warnings.Add("Журнал пуст, оценивать нечего.");
                 return new AnalysisReport(DisplayName, 0, 0, new List<StepReportLine>(), warnings);
             }
 
             JournalSummary summary = JournalSummary.From(journal);
             if (!summary.IsFinished)
             {
-                warnings.Add("Прохождение не завершено — оценка предварительная.");
+                warnings.Add("Прохождение не завершено, оценка предварительная.");
             }
 
             if (!summary.HasPlan)
             {
-                warnings.Add("В журнале нет списка шагов (StepPlanned) — учтены только шаги, встречающиеся в записях.");
+                warnings.Add("В журнале нет списка шагов (StepPlanned). Учтены только шаги, которые встречаются в записях.");
             }
 
             return Analyze(summary, warnings);

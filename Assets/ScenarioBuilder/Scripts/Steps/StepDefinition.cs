@@ -11,7 +11,7 @@ namespace ScenarioBuilder.Steps
     /// </summary>
     public abstract class StepDefinition : ScriptableObject
     {
-        [SerializeField, Tooltip("Уникальный идентификатор шага. Используется в журнале. По умолчанию — имя ассета.")]
+        [SerializeField, Tooltip("Уникальный идентификатор шага. Используется в журнале. По умолчанию берётся имя ассета.")]
         private string id;
 
         [SerializeField, TextArea(1, 3), Tooltip("Текст задания, который видит пользователь.")]

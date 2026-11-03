@@ -10,7 +10,7 @@ namespace ScenarioBuilder.Sources
     /// </summary>
     public abstract class ScenarioActionSource : ScenarioRunnerLink
     {
-        [SerializeField, TextArea(1, 2), Tooltip("Подсказка в обучающем туре: как выполнить действие. Пусто — стандартный текст.")]
+        [SerializeField, TextArea(1, 2), Tooltip("Подсказка в обучающем туре: как выполнить действие. Если пусто, будет стандартный текст.")]
         private string hint;
 
         /// <summary>Actions this source can send. Feedback and hints use it to find the object of a step.</summary>

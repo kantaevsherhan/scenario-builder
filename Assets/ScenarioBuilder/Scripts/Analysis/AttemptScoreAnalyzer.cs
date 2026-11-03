@@ -35,12 +35,12 @@ namespace ScenarioBuilder.Analysis
 
             if (attemptsWereDerived)
             {
-                warnings.Add("В записях о завершении нет номера попытки — попытки вычислены по числу нарушений.");
+                warnings.Add("В записях о завершении нет номера попытки, поэтому попытки посчитаны по числу нарушений.");
             }
 
             if (summary.Count(StepResult.Failed) + summary.Count(StepResult.Skipped) > 0)
             {
-                warnings.Add("В журнале есть проваленные или пропущенные шаги (экзаменационный прогон) — за них 0 баллов.");
+                warnings.Add("В журнале есть проваленные или пропущенные шаги (похоже на экзамен). За них 0 баллов.");
             }
 
             int maxScore = firstAttemptPoints * summary.Steps.Count;

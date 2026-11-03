@@ -38,14 +38,14 @@ namespace ScenarioBuilder.Analysis
 
             if (summary.Steps.Any(step => step.Result == StepResult.Completed && step.Violations > 0))
             {
-                warnings.Add("Есть шаги, выполненные после повторных попыток (тренировочный прогон) — " +
-                             "штрафуются только статусы Failed и Skipped.");
+                warnings.Add("Есть шаги, выполненные не с первой попытки (похоже на тренировку). " +
+                             "Штраф начисляется только за Failed и Skipped.");
             }
 
             int unfinished = summary.Count(StepResult.Unfinished);
             if (unfinished > 0)
             {
-                warnings.Add($"Шагов без итогового статуса: {unfinished} — штраф за них не начислен.");
+                warnings.Add($"Шагов без итогового статуса: {unfinished}, штраф за них не начислен.");
             }
 
             return new AnalysisReport(DisplayName, Mathf.Max(0, baseScore - penalties), baseScore, lines, warnings);

@@ -14,7 +14,7 @@ namespace ScenarioBuilder.Modes
         [SerializeField, Min(1), Tooltip("Сколько нарушений в группе допускается, прежде чем её оставшиеся шаги будут пропущены.")]
         private int violationThreshold = 2;
 
-        [SerializeField, Tooltip("Группы проходят по очереди. Внутри группы — свой порядок активации.")]
+        [SerializeField, Tooltip("Группы проходят по очереди. У каждой группы свой порядок активации.")]
         private List<StepGroup> groups = new();
 
         public int ViolationThreshold => violationThreshold;

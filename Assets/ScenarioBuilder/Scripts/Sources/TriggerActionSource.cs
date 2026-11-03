@@ -7,7 +7,7 @@ namespace ScenarioBuilder.Sources
     [RequireComponent(typeof(Collider))]
     public sealed class TriggerActionSource : ScenarioActionSource
     {
-        [SerializeField, Tooltip("Тег объекта, на который реагирует триггер. Пусто — любой объект.")]
+        [SerializeField, Tooltip("Тег объекта, на который реагирует триггер. Если пусто, подходит любой объект.")]
         private string requiredTag = "Player";
 
         [SerializeField, Tooltip("Действие при входе в зону. Можно оставить пустым.")]
