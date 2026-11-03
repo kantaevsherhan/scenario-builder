@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace ScenarioBuilder.UI
 {
@@ -32,7 +33,6 @@ namespace ScenarioBuilder.UI
         private Canvas canvas;
         private SpotlightTarget target;
         private Rect hole;
-        private bool snapHole;
 
         public event Action NextClicked;
         public event Action SkipClicked;
@@ -49,7 +49,6 @@ namespace ScenarioBuilder.UI
 
         public void Show(SpotlightTarget newTarget, string titleText, string bodyText, string counterText, string nextText)
         {
-            snapHole = !IsVisible;
             target = newTarget;
             title.text = titleText;
             body.text = bodyText;
@@ -61,7 +60,16 @@ namespace ScenarioBuilder.UI
             LateUpdate();
         }
 
-        public void Hide() => root.gameObject.SetActive(false);
+        public void Hide()
+        {
+            root.gameObject.SetActive(false);
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem != null && eventSystem.currentSelectedGameObject != null &&
+                eventSystem.currentSelectedGameObject.transform.IsChildOf(root))
+            {
+                eventSystem.SetSelectedGameObject(null);
+            }
+        }
 
         private void LateUpdate()
         {
@@ -70,10 +78,9 @@ namespace ScenarioBuilder.UI
                 return;
             }
 
+            // No easing: a hole still moving to the new target would swallow the click aimed at it.
             Rect bounds = root.rect;
-            Rect wanted = TryGetTargetRect(out Rect targetRect) ? Expand(targetRect, padding) : new Rect(bounds.center, Vector2.zero);
-            hole = snapHole ? wanted : Lerp(hole, wanted, 1f - Mathf.Exp(-14f * Time.unscaledDeltaTime));
-            snapHole = false;
+            hole = TryGetTargetRect(out Rect targetRect) ? Expand(targetRect, padding) : new Rect(bounds.center, Vector2.zero);
 
             Place(top, Rect.MinMaxRect(bounds.xMin, hole.yMax, bounds.xMax, bounds.yMax));
             Place(bottom, Rect.MinMaxRect(bounds.xMin, bounds.yMin, bounds.xMax, hole.yMin));
@@ -141,9 +148,5 @@ namespace ScenarioBuilder.UI
 
         private static Rect Expand(Rect rect, float amount) =>
             Rect.MinMaxRect(rect.xMin - amount, rect.yMin - amount, rect.xMax + amount, rect.yMax + amount);
-
-        private static Rect Lerp(Rect from, Rect to, float t) =>
-            Rect.MinMaxRect(Mathf.Lerp(from.xMin, to.xMin, t), Mathf.Lerp(from.yMin, to.yMin, t),
-                Mathf.Lerp(from.xMax, to.xMax, t), Mathf.Lerp(from.yMax, to.yMax, t));
     }
 }
