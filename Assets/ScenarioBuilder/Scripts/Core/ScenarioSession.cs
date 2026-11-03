@@ -137,12 +137,13 @@ namespace ScenarioBuilder.Core
             var result = new List<GroupState>();
             foreach (StepGroup group in mode.Groups)
             {
+                int groupIndex = result.Count;
                 var stages = new List<List<StepState>>();
                 foreach (List<StepDefinition> stage in ActivationPlan.BuildStages(group.Steps))
                 {
                     List<StepState> stageSteps = stage
                         .Where(step => WarnIfDuplicate(usedSteps.Add(step), step, mode))
-                        .Select(step => new StepState(step, group.Name, worldState))
+                        .Select(step => new StepState(step, group.Name, groupIndex, worldState))
                         .ToList();
                     if (stageSteps.Count > 0)
                     {

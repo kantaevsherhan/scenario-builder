@@ -17,16 +17,21 @@ namespace ScenarioBuilder.Core
     /// <summary>Run-time state of one step within one run.</summary>
     public sealed class StepState
     {
-        internal StepState(StepDefinition definition, string groupName, ScenarioWorldState worldState)
+        internal StepState(StepDefinition definition, string groupName, int groupIndex, ScenarioWorldState worldState)
         {
             Definition = definition;
             GroupName = groupName;
+            GroupIndex = groupIndex;
             Context = new StepContext(worldState);
         }
 
         public StepDefinition Definition { get; }
         public string Id => Definition.Id;
         public string GroupName { get; }
+
+        /// <summary>0-based index of the step group in the mode.</summary>
+        public int GroupIndex { get; }
+
         public StepStatus Status { get; internal set; }
 
         /// <summary>Current attempt number, starting from 1.</summary>

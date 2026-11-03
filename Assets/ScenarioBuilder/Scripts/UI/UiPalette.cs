@@ -12,6 +12,9 @@ namespace ScenarioBuilder.UI
         public static readonly Color Error = new(1f, 0.36f, 0.36f);
         public static readonly Color Warning = new(0.96f, 0.72f, 0.25f);
         public static readonly Color Muted = new(0.55f, 0.6f, 0.7f);
+        public static readonly Color Text = new(0.91f, 0.93f, 0.96f);
+        public static readonly Color Card = new(0.133f, 0.165f, 0.227f);
+        public static readonly Color ActiveCard = new(0.15f, 0.24f, 0.37f);
 
         public static Color For(StepStatus status) => status switch
         {
@@ -28,6 +31,15 @@ namespace ScenarioBuilder.UI
             StepResult.Failed => Error,
             StepResult.Skipped => Warning,
             _ => Muted,
+        };
+
+        public static string Label(StepStatus status) => status switch
+        {
+            StepStatus.Active => "Сейчас",
+            StepStatus.Completed => "Выполнен",
+            StepStatus.Failed => "Провален",
+            StepStatus.Skipped => "Пропущен",
+            _ => "Ожидает очереди",
         };
 
         public static string Label(StepResult result) => result switch

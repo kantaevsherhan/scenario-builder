@@ -40,6 +40,8 @@ namespace ScenarioBuilder.Demo.Editor
             SerializedWiring.Set(hud, "groupText", taskPanel.GroupText);
             SerializedWiring.Set(hud, "progressText", taskPanel.ProgressText);
             SerializedWiring.Set(hud, "stepCardTemplate", taskPanel.StepCardTemplate);
+            SerializedWiring.Set(hud, "groupHeaderTemplate", taskPanel.GroupHeaderTemplate);
+            SerializedWiring.Set(hud, "stepList", taskPanel.StepList);
             SerializedWiring.Set(hud, "showResultsButton", taskPanel.ShowResultsButton);
             SerializedWiring.Set(hud, "toast", toast);
             SerializedWiring.Set(hud, "journalPanel", journal);
@@ -112,6 +114,8 @@ namespace ScenarioBuilder.Demo.Editor
             public TMP_Text GroupText;
             public TMP_Text ProgressText;
             public StepCardView StepCardTemplate;
+            public GroupHeaderView GroupHeaderTemplate;
+            public ScrollRect StepList;
             public Button ShowResultsButton;
         }
 
@@ -131,14 +135,17 @@ namespace ScenarioBuilder.Demo.Editor
             };
             UiFactory.Size(UiFactory.Panel("Separator", panel.transform, UiFactory.CardColor, rounded: false).gameObject, -1, 2);
 
-            RectTransform steps = UiFactory.Rect("ActiveSteps", panel.transform);
-            UiFactory.VerticalLayout(steps.gameObject, 10).childControlHeight = false;
-            UiFactory.Size(steps.gameObject, flexibleHeight: 1);
+            result.StepList = UiFactory.ScrollView("StepList", panel.transform, out RectTransform steps, 6f);
+            result.StepList.GetComponent<Image>().color = Color.clear;
+            result.StepList.viewport.offsetMin = Vector2.zero;
+            result.StepList.viewport.offsetMax = Vector2.zero;
+            UiFactory.Size(result.StepList.gameObject, flexibleHeight: 1);
+            result.GroupHeaderTemplate = GroupHeader(steps);
             result.StepCardTemplate = StepCard(steps);
 
             result.ShowResultsButton = UiFactory.Button("ShowResultsButton", panel.transform, "Показать результаты", UiFactory.AccentColor, 52);
             UiFactory.Text("ControlsHint", panel.transform,
-                "Движение: WASD или стрелки.\nКнопки и ползунок — на пульте справа.\nДействие вне очереди считается нарушением.",
+                "Движение: WASD или стрелки. Кнопки и ползунок — на пульте справа.",
                 15, UiFactory.MutedTextColor);
             return result;
         }
@@ -146,24 +153,39 @@ namespace ScenarioBuilder.Demo.Editor
         private static StepCardView StepCard(Transform parent)
         {
             Image card = UiFactory.Panel("StepCardTemplate", parent, UiFactory.CardColor);
-            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(card.gameObject, 14);
-            layout.padding = new RectOffset(14, 14, 12, 12);
+            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(card.gameObject, 12);
+            layout.padding = new RectOffset(10, 12, 9, 9);
             layout.childForceExpandHeight = true;
-            card.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             Image accent = UiFactory.Panel("Accent", card.transform, UiFactory.AccentColor);
-            UiFactory.Size(accent.gameObject, 6);
+            UiFactory.Size(accent.gameObject, 5);
 
             RectTransform texts = UiFactory.Rect("Texts", card.transform);
-            UiFactory.VerticalLayout(texts.gameObject, 4);
+            UiFactory.VerticalLayout(texts.gameObject, 3);
             UiFactory.Size(texts.gameObject, flexibleWidth: 1);
-            TextMeshProUGUI title = UiFactory.Text("Title", texts, "Задание", 20, UiFactory.TextColor, FontStyles.Bold);
-            TextMeshProUGUI details = UiFactory.Text("Details", texts, "Ожидает выполнения", 15, UiFactory.MutedTextColor);
+            TextMeshProUGUI title = UiFactory.Text("Title", texts, "Задание", 18, UiFactory.TextColor);
+            TextMeshProUGUI details = UiFactory.Text("Details", texts, "Сейчас", 13, UiFactory.AccentColor, FontStyles.Bold);
+            details.characterSpacing = 4;
 
             var view = card.gameObject.AddComponent<StepCardView>();
             SerializedWiring.Set(view, "title", title);
             SerializedWiring.Set(view, "details", details);
             SerializedWiring.Set(view, "accent", accent);
+            SerializedWiring.Set(view, "background", card);
+            return view;
+        }
+
+        private static GroupHeaderView GroupHeader(Transform parent)
+        {
+            Image background = UiFactory.Panel("GroupHeaderTemplate", parent, Color.clear);
+            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(background.gameObject, 0);
+            layout.padding = new RectOffset(10, 10, 7, 7);
+            layout.childForceExpandWidth = true;
+            TextMeshProUGUI label = UiFactory.Text("Label", background.transform, "Группа", 16, UiFactory.MutedTextColor);
+
+            var view = background.gameObject.AddComponent<GroupHeaderView>();
+            SerializedWiring.Set(view, "label", label);
+            SerializedWiring.Set(view, "background", background);
             return view;
         }
 

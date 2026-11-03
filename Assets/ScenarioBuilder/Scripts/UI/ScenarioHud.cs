@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using ScenarioBuilder.Core;
 using ScenarioBuilder.Modes;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace ScenarioBuilder.UI
 {
     /// <summary>
-    /// Main overlay: scenario title, mode switch, current group, progress, active step cards
+    /// Main overlay: scenario title, mode switch, the list of steps with their state
     /// and short messages about violations and completed steps.
     /// </summary>
     public sealed class ScenarioHud : MonoBehaviour
@@ -25,6 +26,8 @@ namespace ScenarioBuilder.UI
         [SerializeField] private TMP_Text groupText;
         [SerializeField] private TMP_Text progressText;
         [SerializeField] private StepCardView stepCardTemplate;
+        [SerializeField] private GroupHeaderView groupHeaderTemplate;
+        [SerializeField] private UnityEngine.UI.ScrollRect stepList;
         [SerializeField] private UnityEngine.UI.Button showResultsButton;
 
         [Header("Other views")]
@@ -34,12 +37,17 @@ namespace ScenarioBuilder.UI
 
         private TemplateList<UnityEngine.UI.Button> modeButtons;
         private TemplateList<StepCardView> stepCards;
+        private TemplateList<GroupHeaderView> groupHeaders;
+        private readonly List<(StepState Step, StepCardView View)> cards = new();
+        private readonly List<GroupHeaderView> headers = new();
         private ScenarioSession session;
+        private StepCardView scrolledTo;
 
         private void Awake()
         {
             modeButtons = new TemplateList<UnityEngine.UI.Button>(modeButtonTemplate);
             stepCards = new TemplateList<StepCardView>(stepCardTemplate);
+            groupHeaders = new TemplateList<GroupHeaderView>(groupHeaderTemplate);
             restartButton.onClick.AddListener(runner.RestartRun);
             journalButton.onClick.AddListener(journalPanel.Show);
             showResultsButton.onClick.AddListener(resultsPanel.ShowLastReport);
@@ -65,6 +73,7 @@ namespace ScenarioBuilder.UI
             session.ViolationRaised += OnViolationRaised;
             session.Finished += Refresh;
             RebuildModeButtons();
+            BuildStepList();
             Refresh();
         }
 
@@ -115,13 +124,67 @@ namespace ScenarioBuilder.UI
                 : "Одна общая группа";
             progressText.text = $"Завершено шагов: {finished} из {session.Steps.Count}";
 
-            stepCards.Clear();
-            foreach (StepState step in session.ActiveSteps)
+            foreach ((StepState step, StepCardView view) in cards)
             {
-                stepCards.Add().Bind(step);
+                view.Bind(step);
+            }
+
+            for (int i = 0; i < headers.Count; i++)
+            {
+                bool isCurrent = !session.IsFinished && i == session.CurrentGroupNumber - 1;
+                bool isDone = session.IsFinished || i < session.CurrentGroupNumber - 1;
+                headers[i].Bind(i + 1, session.Steps.First(step => step.GroupIndex == i).GroupName, isCurrent, isDone);
             }
 
             showResultsButton.gameObject.SetActive(session.IsFinished);
+            ScrollToFirstActive();
+        }
+
+        /// <summary>Rows are created once per run and only re-bound afterwards.</summary>
+        private void BuildStepList()
+        {
+            stepCards.Clear();
+            groupHeaders.Clear();
+            cards.Clear();
+            headers.Clear();
+            scrolledTo = null;
+
+            int lastGroup = -1;
+            foreach (StepState step in session.Steps)
+            {
+                if (session.GroupCount > 1 && step.GroupIndex != lastGroup)
+                {
+                    headers.Add(groupHeaders.Add());
+                    lastGroup = step.GroupIndex;
+                }
+
+                cards.Add((step, stepCards.Add()));
+            }
+
+            stepList.verticalNormalizedPosition = 1f;
+        }
+
+        private void ScrollToFirstActive()
+        {
+            StepCardView target = cards.FirstOrDefault(card => card.Step.Status == StepStatus.Active).View;
+            if (target == null || target == scrolledTo)
+            {
+                return;
+            }
+
+            scrolledTo = target;
+            Canvas.ForceUpdateCanvases();
+            RectTransform content = stepList.content;
+            float scrollable = content.rect.height - stepList.viewport.rect.height;
+            if (scrollable <= 0f)
+            {
+                return;
+            }
+
+            var row = (RectTransform)target.transform;
+            float rowTop = -row.localPosition.y - row.rect.height * (1f - row.pivot.y);
+            float offset = Mathf.Clamp(rowTop - 60f, 0f, scrollable);
+            stepList.verticalNormalizedPosition = 1f - offset / scrollable;
         }
 
         private void RebuildModeButtons()
