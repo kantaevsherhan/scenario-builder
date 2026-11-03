@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.UI
 {
-    /// <summary>Colors and Russian labels for step statuses, shared by all views.</summary>
     public static class UiPalette
     {
         public static readonly Color Accent = new(0.31f, 0.66f, 1f);

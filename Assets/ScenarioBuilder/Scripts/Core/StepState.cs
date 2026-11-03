@@ -6,7 +6,6 @@ namespace ScenarioBuilder.Core
 {
     public enum StepStatus
     {
-        /// <summary>Waiting for its turn.</summary>
         Pending,
         Active,
         Completed,
@@ -14,7 +13,6 @@ namespace ScenarioBuilder.Core
         Skipped,
     }
 
-    /// <summary>Run-time state of one step within one run.</summary>
     public sealed class StepState
     {
         internal StepState(StepDefinition definition, string groupName, int groupIndex, ScenarioWorldState worldState)

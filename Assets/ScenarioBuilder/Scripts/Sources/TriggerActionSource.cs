@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Sources
 {
-    /// <summary>Raises actions when an object with the given tag enters or leaves this trigger collider.</summary>
     [RequireComponent(typeof(Collider))]
     public sealed class TriggerActionSource : ScenarioActionSource
     {

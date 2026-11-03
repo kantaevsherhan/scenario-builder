@@ -12,7 +12,6 @@ namespace ScenarioBuilder.Analysis
         Skipped,
     }
 
-    /// <summary>Everything the journal says about one step.</summary>
     public sealed class StepOutcome
     {
         public StepOutcome(string stepId)

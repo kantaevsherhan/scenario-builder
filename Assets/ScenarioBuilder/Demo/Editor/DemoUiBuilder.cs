@@ -12,7 +12,6 @@ using UnityEngine.UI;
 
 namespace ScenarioBuilder.Demo.Editor
 {
-    /// <summary>Builds the demo overlay: top bar, task list, control panel, toast, results and journal windows.</summary>
     internal static class DemoUiBuilder
     {
         private const float TopBarHeight = 76f;

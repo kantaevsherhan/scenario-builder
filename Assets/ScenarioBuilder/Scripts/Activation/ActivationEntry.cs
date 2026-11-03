@@ -13,7 +13,6 @@ namespace ScenarioBuilder.Activation
         WithPrevious,
     }
 
-    /// <summary>A step placed into a mode's activation order.</summary>
     [Serializable]
     public sealed class ActivationEntry
     {

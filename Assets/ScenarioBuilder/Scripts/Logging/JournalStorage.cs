@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Logging
 {
-    /// <summary>Reads and writes run journals as JSON files.</summary>
     public static class JournalStorage
     {
         public static string DirectoryPath => Path.Combine(Application.persistentDataPath, "Journals");

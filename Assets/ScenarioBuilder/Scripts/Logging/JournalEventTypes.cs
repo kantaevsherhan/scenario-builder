@@ -33,7 +33,6 @@ namespace ScenarioBuilder.Logging
         public const string Violation = "Violation";
     }
 
-    /// <summary>Keys of optional entry fields.</summary>
     public static class JournalFieldKeys
     {
         public const string Attempt = "attempt";

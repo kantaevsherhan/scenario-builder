@@ -12,7 +12,6 @@ namespace ScenarioBuilder.Steps
         Violation,
     }
 
-    /// <summary>How a step reacted to a single action.</summary>
     public readonly struct StepEvaluation
     {
         private StepEvaluation(StepEvaluationKind kind, string message)

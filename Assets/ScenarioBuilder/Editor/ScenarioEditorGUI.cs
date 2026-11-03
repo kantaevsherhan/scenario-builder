@@ -3,7 +3,6 @@ using UnityEditor;
 
 namespace ScenarioBuilder.Editor
 {
-    /// <summary>Small IMGUI helpers shared by the scenario inspectors.</summary>
     internal static class ScenarioEditorGUI
     {
         public static void DrawIssues(IReadOnlyCollection<string> issues)

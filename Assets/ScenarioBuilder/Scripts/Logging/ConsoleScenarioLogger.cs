@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Logging
 {
-    /// <summary>Prints journal entries to the Unity console.</summary>
     [CreateAssetMenu(menuName = "Scenario Builder/Loggers/Console Logger", fileName = "ConsoleLogger", order = 60)]
     public sealed class ConsoleScenarioLogger : ScenarioLogger
     {

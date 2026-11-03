@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Demo
 {
-    /// <summary>Shows a state flag on a 3D object color and a text label.</summary>
     public sealed class StateFlagIndicator : ScenarioRunnerLink
     {
         [SerializeField] private StateFlag flag;

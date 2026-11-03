@@ -3,7 +3,6 @@ using System.Linq;
 
 namespace ScenarioBuilder.Core
 {
-    /// <summary>Run-time state of one step group: its stages and violation counter.</summary>
     internal sealed class GroupState
     {
         public GroupState(string name, List<List<StepState>> stages)

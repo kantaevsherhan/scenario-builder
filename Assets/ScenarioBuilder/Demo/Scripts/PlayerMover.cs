@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 namespace ScenarioBuilder.Demo
 {
-    /// <summary>Moves the demo player with WASD / arrow keys and returns it to the start on every new run.</summary>
     [RequireComponent(typeof(Rigidbody))]
     public sealed class PlayerMover : ScenarioRunnerLink
     {

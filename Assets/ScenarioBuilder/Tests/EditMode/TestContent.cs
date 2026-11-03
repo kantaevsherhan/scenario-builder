@@ -24,7 +24,6 @@ namespace ScenarioBuilder.Tests
 
         public StateFlag Flag(string name) => Create<StateFlag>(name);
 
-        /// <summary>A step completed by the given actions in order.</summary>
         public ActionStep Step(string id, params ActionDefinition[] sequence) =>
             Step(id, sequence.Select(action => new RequiredAction(action)));
 

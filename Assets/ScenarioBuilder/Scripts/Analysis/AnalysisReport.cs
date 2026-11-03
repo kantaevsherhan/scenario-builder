@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 namespace ScenarioBuilder.Analysis
 {
-    /// <summary>Score line of a single step.</summary>
     public sealed class StepReportLine
     {
         public StepReportLine(string stepId, string title, StepResult result, int attempts, int points)
@@ -23,7 +22,6 @@ namespace ScenarioBuilder.Analysis
         public int Points { get; }
     }
 
-    /// <summary>Result of analyzing one run journal.</summary>
     public sealed class AnalysisReport
     {
         public AnalysisReport(string analyzerName, int score, int maxScore,

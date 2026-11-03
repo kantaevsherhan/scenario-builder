@@ -10,7 +10,6 @@ namespace ScenarioBuilder.UI
         Error,
     }
 
-    /// <summary>Short message that appears for a few seconds and fades out.</summary>
     [RequireComponent(typeof(CanvasGroup))]
     public sealed class MessageToast : MonoBehaviour
     {

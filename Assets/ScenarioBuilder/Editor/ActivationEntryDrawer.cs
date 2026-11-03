@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Editor
 {
-    /// <summary>Draws an activation entry in one line: step on the left, activation mode on the right.</summary>
     [CustomPropertyDrawer(typeof(ActivationEntry))]
     public sealed class ActivationEntryDrawer : PropertyDrawer
     {

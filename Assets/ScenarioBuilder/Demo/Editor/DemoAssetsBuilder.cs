@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Demo.Editor
 {
-    /// <summary>All demo assets the scene builder needs to wire.</summary>
     internal sealed class DemoAssets
     {
         public readonly Dictionary<string, ActionDefinition> Actions = new();

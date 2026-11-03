@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.UI
 {
-    /// <summary>Settings window: hints and the guided tour.</summary>
     public sealed class SettingsPanel : MonoBehaviour, IClosablePanel
     {
         [SerializeField] private GameObject root;

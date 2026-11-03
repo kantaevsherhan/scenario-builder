@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.UI
 {
-    /// <summary>One step in the task list: highlighted while active, colored by its result once finished.</summary>
     public sealed class StepCardView : MonoBehaviour
     {
         [SerializeField] private TMP_Text title;

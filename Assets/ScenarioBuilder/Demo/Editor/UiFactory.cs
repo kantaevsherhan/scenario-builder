@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 namespace ScenarioBuilder.Demo.Editor
 {
-    /// <summary>Creates consistently styled uGUI elements for the demo scene.</summary>
     internal static class UiFactory
     {
         public static readonly Color PanelColor = Hex("161B26", 0.94f);

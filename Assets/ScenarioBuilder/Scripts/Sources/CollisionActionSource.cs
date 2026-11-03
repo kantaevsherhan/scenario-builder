@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Sources
 {
-    /// <summary>Raises an action when an object with the given tag collides with this object.</summary>
     [RequireComponent(typeof(Collider))]
     public sealed class CollisionActionSource : ScenarioActionSource
     {

@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.UI
 {
-    /// <summary>Exam group title in the task list; the group in progress stands out.</summary>
     public sealed class GroupHeaderView : MonoBehaviour
     {
         [SerializeField] private TMP_Text label;

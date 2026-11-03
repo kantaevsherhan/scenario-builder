@@ -6,7 +6,6 @@ using ScenarioBuilder.Steps;
 
 namespace ScenarioBuilder.Core
 {
-    /// <summary>Finds configuration mistakes. Used by the custom inspectors and the tests.</summary>
     public static class ScenarioValidator
     {
         public static List<string> Validate(ScenarioDefinition scenario)

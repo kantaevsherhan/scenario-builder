@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace ScenarioBuilder.Sources
 {
-    /// <summary>Raises an action when the UI button on the same object is clicked.</summary>
     [RequireComponent(typeof(UnityEngine.UI.Button))]
     public sealed class ButtonActionSource : ScenarioActionSource
     {

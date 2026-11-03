@@ -294,7 +294,6 @@ namespace ScenarioBuilder.Demo.Editor
         }
     }
 
-    /// <summary>Scene objects the UI builder and effects need to reference.</summary>
     internal sealed class DemoWorld
     {
         public Transform Root;
