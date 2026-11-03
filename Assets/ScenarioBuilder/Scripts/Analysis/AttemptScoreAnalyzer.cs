@@ -10,8 +10,10 @@ namespace ScenarioBuilder.Analysis
     [CreateAssetMenu(menuName = "Scenario Builder/Analyzers/Attempt Score Analyzer", fileName = "AttemptScoreAnalyzer", order = 50)]
     public sealed class AttemptScoreAnalyzer : ScenarioAnalyzer
     {
-        [SerializeField, Min(0)] private int firstAttemptPoints = 10;
-        [SerializeField, Min(0)] private int secondAttemptPoints = 5;
+        [SerializeField, Min(0), Tooltip("Баллы за шаг, выполненный с первой попытки.")]
+        private int firstAttemptPoints = 10;
+        [SerializeField, Min(0), Tooltip("Баллы за шаг, выполненный со второй попытки.")]
+        private int secondAttemptPoints = 5;
         [SerializeField, Min(0), Tooltip("Баллы за выполнение с третьей и последующих попыток.")]
         private int laterAttemptPoints;
 

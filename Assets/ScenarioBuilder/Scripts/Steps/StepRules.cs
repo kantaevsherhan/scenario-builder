@@ -9,7 +9,8 @@ namespace ScenarioBuilder.Steps
     [Serializable]
     public sealed class StateRequirement
     {
-        [SerializeField] private StateFlag flag;
+        [SerializeField, Tooltip("Состояние сцены, которое проверяется в момент действия.")]
+        private StateFlag flag;
 
         [SerializeField, Tooltip("Включено — флаг должен быть установлен. Выключено — снят.")]
         private bool mustBeSet = true;
@@ -45,7 +46,8 @@ namespace ScenarioBuilder.Steps
     [Serializable]
     public sealed class RequiredAction
     {
-        [SerializeField] private ActionDefinition action;
+        [SerializeField, Tooltip("Действие, которого ждёт шаг.")]
+        private ActionDefinition action;
 
         [SerializeField, Tooltip("Состояния сцены, которые должны выполняться в момент действия.")]
         private List<StateRequirement> requirements = new();
@@ -69,7 +71,8 @@ namespace ScenarioBuilder.Steps
     [Serializable]
     public sealed class ForbiddenAction
     {
-        [SerializeField] private ActionDefinition action;
+        [SerializeField, Tooltip("Действие, которое во время шага считается ошибкой.")]
+        private ActionDefinition action;
 
         [SerializeField, Tooltip("Сообщение при нарушении. Пусто — сформируется автоматически.")]
         private string message;

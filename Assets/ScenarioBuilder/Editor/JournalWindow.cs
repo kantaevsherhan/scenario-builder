@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ScenarioBuilder.Analysis;
 using ScenarioBuilder.Core;
 using ScenarioBuilder.Logging;
+using ScenarioBuilder.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -98,16 +100,24 @@ namespace ScenarioBuilder.Editor
             EditorGUILayout.LabelField(journalTitle, EditorStyles.boldLabel);
             EditorGUILayout.LabelField("Сценарий / режим", $"{journal.ScenarioName} / {journal.ModeName}");
 
-            using (new EditorGUILayout.HorizontalScope())
+            List<ScenarioAnalyzer> analyzers = ScenarioEditorGUI.FindAssets<ScenarioAnalyzer>();
+            if (analyzer == null && analyzers.Count > 0)
             {
-                analyzer = (ScenarioAnalyzer)EditorGUILayout.ObjectField("Анализатор", analyzer, typeof(ScenarioAnalyzer), false);
-                using (new EditorGUI.DisabledScope(analyzer == null))
-                {
-                    if (GUILayout.Button("Оценить", GUILayout.Width(90)))
-                    {
-                        report = analyzer.Analyze(journal);
-                    }
-                }
+                analyzer = analyzers[0];
+            }
+
+            int current = analyzers.IndexOf(analyzer);
+            int chosen = EditorGUILayout.Popup(new GUIContent("Анализатор", "Журнал оценивается заново при каждой смене анализатора."),
+                current, analyzers.Select(item => new GUIContent(ScenarioEditorGUI.Label(item))).ToArray());
+            if (chosen != current)
+            {
+                analyzer = analyzers[chosen];
+                report = null;
+            }
+
+            if (report == null && analyzer != null)
+            {
+                report = analyzer.Analyze(journal);
             }
 
             contentScroll = EditorGUILayout.BeginScrollView(contentScroll);
@@ -134,10 +144,14 @@ namespace ScenarioBuilder.Editor
                 EditorGUILayout.HelpBox(warning, MessageType.Warning);
             }
 
+            float labelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 380;
             foreach (StepReportLine line in report.Lines)
             {
-                EditorGUILayout.LabelField(line.Title, $"{line.Result}, попыток: {line.Attempts}, баллы: {line.Points:+0;-0;0}");
+                EditorGUILayout.LabelField(line.Title, $"{UiPalette.Label(line.Result)}, попыток: {line.Attempts}, баллы: {line.Points:+0;-0;0}");
             }
+
+            EditorGUIUtility.labelWidth = labelWidth;
         }
 
         private void RefreshFiles() => files = JournalStorage.ListFiles();

@@ -16,7 +16,8 @@ namespace ScenarioBuilder.Activation
     [Serializable]
     public sealed class ActivationEntry
     {
-        [SerializeField] private StepDefinition step;
+        [SerializeField, Tooltip("Шаг из библиотеки сценария. Один и тот же шаг можно использовать в нескольких режимах.")]
+        private StepDefinition step;
 
         [SerializeField, Tooltip("«После предыдущих» — шаг откроется, когда завершатся все шаги выше. " +
                                  "«Вместе с предыдущим» — шаг откроется одновременно с шагом выше.")]

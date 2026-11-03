@@ -9,7 +9,8 @@ namespace ScenarioBuilder.Sources
     /// </summary>
     public sealed class StateFlagSource : ScenarioRunnerLink
     {
-        [SerializeField] private StateFlag flag;
+        [SerializeField, Tooltip("Флаг состояния, который этот объект включает и выключает.")]
+        private StateFlag flag;
 
         [SerializeField, Tooltip("Значение флага при старте сцены.")]
         private bool initialValue;

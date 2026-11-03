@@ -8,7 +8,8 @@ namespace ScenarioBuilder.Activation
     [Serializable]
     public sealed class StepGroup
     {
-        [SerializeField] private string name;
+        [SerializeField, Tooltip("Название группы. Видно в списке шагов и в журнале.")]
+        private string name;
 
         [SerializeField, Tooltip("Шаги группы в порядке активации. Перетаскивайте, чтобы поменять порядок.")]
         private List<ActivationEntry> steps = new();

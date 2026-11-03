@@ -11,9 +11,12 @@ namespace ScenarioBuilder.Analysis
     [CreateAssetMenu(menuName = "Scenario Builder/Analyzers/Penalty Score Analyzer", fileName = "PenaltyScoreAnalyzer", order = 51)]
     public sealed class PenaltyScoreAnalyzer : ScenarioAnalyzer
     {
-        [SerializeField, Min(0)] private int baseScore = 100;
-        [SerializeField, Min(0)] private int failedPenalty = 10;
-        [SerializeField, Min(0)] private int skippedPenalty = 5;
+        [SerializeField, Min(0), Tooltip("С этого числа начинается оценка, штрафы вычитаются из него.")]
+        private int baseScore = 100;
+        [SerializeField, Min(0), Tooltip("Штраф за проваленный шаг.")]
+        private int failedPenalty = 10;
+        [SerializeField, Min(0), Tooltip("Штраф за пропущенный шаг (группа закрыта из-за нарушений или прохождение прервано).")]
+        private int skippedPenalty = 5;
 
         protected override AnalysisReport Analyze(JournalSummary summary, List<string> warnings)
         {
