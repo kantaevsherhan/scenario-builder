@@ -185,6 +185,12 @@ namespace ScenarioBuilder.UI
 
             var row = (RectTransform)target.transform;
             float rowTop = -row.localPosition.y - row.rect.height * (1f - row.pivot.y);
+            float current = (1f - stepList.verticalNormalizedPosition) * scrollable;
+            if (rowTop >= current && rowTop + row.rect.height <= current + stepList.viewport.rect.height)
+            {
+                return;
+            }
+
             float offset = Mathf.Clamp(rowTop - 60f, 0f, scrollable);
             stepList.verticalNormalizedPosition = 1f - offset / scrollable;
         }
