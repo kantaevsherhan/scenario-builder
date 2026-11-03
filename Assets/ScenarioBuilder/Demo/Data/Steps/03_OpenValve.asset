@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf78bf6e8f2513488454efa04e2e2eb, type: 3}
+  m_Name: 03_OpenValve
+  m_EditorClassIdentifier: ScenarioBuilder.Runtime::ScenarioBuilder.Steps.ActionStep
+  id: open-valve
+  instruction: "\u041E\u0442\u043A\u0440\u043E\u0439\u0442\u0435 \u043A\u043B\u0430\u043F\u0430\u043D"
+  requiredActions:
+  - action: {fileID: 11400000, guid: 4530bbb21409b2a499702c1eda5aa1e9, type: 2}
+    requirements: []
+  wrongOrderIsViolation: 1
+  forbiddenActions:
+  - action: {fileID: 11400000, guid: 718fd44dd43882b41bfe4dd266374a06, type: 2}
+    message: "\u041D\u0430\u0441\u043E\u0441 \u043D\u0435\u043B\u044C\u0437\u044F \u0437\u0430\u043F\u0443\u0441\u043A\u0430\u0442\u044C, \u043F\u043E\u043A\u0430 \u043D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442 \u043A\u043B\u0430\u043F\u0430\u043D"
