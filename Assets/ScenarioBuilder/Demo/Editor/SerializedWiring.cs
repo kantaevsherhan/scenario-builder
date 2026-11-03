@@ -23,6 +23,14 @@ namespace ScenarioBuilder.Demo.Editor
             return target;
         }
 
+        public static T Set<T>(T target, string property, bool value) where T : Object
+        {
+            var serialized = new SerializedObject(target);
+            serialized.FindProperty(property).boolValue = value;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return target;
+        }
+
         public static T SetList<T>(T target, string property, IReadOnlyList<Object> values) where T : Object
         {
             var serialized = new SerializedObject(target);

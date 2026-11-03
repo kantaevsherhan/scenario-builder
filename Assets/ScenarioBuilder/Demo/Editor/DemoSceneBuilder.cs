@@ -54,6 +54,7 @@ namespace ScenarioBuilder.Demo.Editor
             CreateLightingAndCamera();
             ScenarioRunner runner = CreateRunner(assets);
             DemoWorld world = CreateWorld(assets);
+            DemoEffectsBuilder.Build(assets, world);
             DemoUiBuilder.Build(assets, runner, world);
 
             materials.Finish();
