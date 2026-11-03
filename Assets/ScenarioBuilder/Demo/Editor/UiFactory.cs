@@ -108,7 +108,7 @@ namespace ScenarioBuilder.Demo.Editor
                 TextAlignmentOptions.Center);
             Stretch(text.rectTransform, 12, 12);
             text.textWrappingMode = TextWrappingModes.NoWrap;
-            text.overflowMode = TextOverflowModes.Ellipsis;
+            text.overflowMode = TextOverflowModes.Truncate;
 
             Size(background.gameObject, preferredWidth, height);
             return button;
