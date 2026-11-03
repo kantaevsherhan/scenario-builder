@@ -27,6 +27,14 @@ namespace ScenarioBuilder.Steps
         public override bool Involves(ActionDefinition action) =>
             action != null && IndexOfRequired(action, 0) >= 0;
 
+        public override IEnumerable<ActionDefinition> ExpectedActions(StepContext context)
+        {
+            if (context.Progress < requiredActions.Count && requiredActions[context.Progress].Action != null)
+            {
+                yield return requiredActions[context.Progress].Action;
+            }
+        }
+
         public override StepEvaluation Evaluate(ActionDefinition action, StepContext context)
         {
             ForbiddenAction forbidden = forbiddenActions.Find(item => item.Action != null && item.Action == action);

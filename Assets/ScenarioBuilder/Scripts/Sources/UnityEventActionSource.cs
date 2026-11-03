@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ScenarioBuilder.Core;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace ScenarioBuilder.Sources
     {
         [SerializeField, Tooltip("Действие, которое отправляется при вызове RaiseAction из UnityEvent.")]
         private ActionDefinition action;
+
+        public override IEnumerable<ActionDefinition> Actions => new[] { action };
 
         public void RaiseAction() => Raise(action);
     }

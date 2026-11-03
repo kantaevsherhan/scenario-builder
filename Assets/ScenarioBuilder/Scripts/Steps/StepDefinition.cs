@@ -26,6 +26,12 @@ namespace ScenarioBuilder.Steps
         /// <summary>True when the action belongs to this step. Used to detect out-of-turn actions.</summary>
         public abstract bool Involves(ActionDefinition action);
 
+        /// <summary>Actions that move the step forward right now. Used for hints, not for evaluation.</summary>
+        public virtual IEnumerable<ActionDefinition> ExpectedActions(StepContext context)
+        {
+            yield break;
+        }
+
         /// <summary>Configuration problems shown in the inspector.</summary>
         public virtual IEnumerable<string> Validate()
         {

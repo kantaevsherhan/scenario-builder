@@ -31,9 +31,10 @@ namespace ScenarioBuilder.Core
             steps = groups.SelectMany(group => group.Steps).ToList();
         }
 
-        /// <summary>A step was activated, completed, failed, skipped or got a new attempt.</summary>
+        /// <summary>A step was activated, moved forward, finished or got a new attempt.</summary>
         public event Action<StepState> StepChanged;
 
+        /// <summary>Raised after the mode has decided what happens to the step, so its status is final.</summary>
         public event Action<StepState, string> ViolationRaised;
         public event Action<JournalEntry> EntryWritten;
         public event Action Finished;
@@ -173,6 +174,7 @@ namespace ScenarioBuilder.Core
                 case StepEvaluationKind.Progressed:
                     Write(StepEntry(JournalEventTypes.StepProgressed, step, message: action.DisplayName)
                         .With(JournalFieldKeys.Attempt, step.Attempt));
+                    StepChanged?.Invoke(step);
                     return true;
                 case StepEvaluationKind.Completed:
                     FinishStep(step, StepStatus.Completed);
@@ -193,7 +195,6 @@ namespace ScenarioBuilder.Core
             Write(StepEntry(JournalEventTypes.StepViolation, step, JournalResults.Violation, message)
                 .With(JournalFieldKeys.Attempt, step.Attempt)
                 .With(JournalFieldKeys.OutOfTurn, isOutOfTurn));
-            ViolationRaised?.Invoke(step, message);
 
             switch (mode.ResolveViolation(group.Violations))
             {
@@ -214,6 +215,8 @@ namespace ScenarioBuilder.Core
 
                     break;
             }
+
+            ViolationRaised?.Invoke(step, message);
         }
 
         private void FinishStep(StepState step, StepStatus status)

@@ -42,9 +42,14 @@ namespace ScenarioBuilder.Modes
         [SerializeField, Tooltip("Анализатор, которым оценивается прохождение в этом режиме.")]
         private ScenarioAnalyzer defaultAnalyzer;
 
+        [SerializeField, Tooltip("Подсказывать, что делать: подсветка нужных объектов и обучающий тур по активным шагам. " +
+                                 "Обычно включено в тренировке и выключено на экзамене.")]
+        private bool showHints = true;
+
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
         public OutOfTurnPolicy OutOfTurnPolicy => outOfTurnPolicy;
         public ScenarioAnalyzer DefaultAnalyzer => defaultAnalyzer;
+        public bool ShowHints => showHints;
 
         /// <summary>Groups run one after another, each with its own activation order.</summary>
         public abstract IReadOnlyList<StepGroup> Groups { get; }
@@ -52,11 +57,12 @@ namespace ScenarioBuilder.Modes
         /// <param name="violationsInGroup">Violations in the current group including this one.</param>
         public abstract ViolationResponse ResolveViolation(int violationsInGroup);
 
-        internal void SetCommon(string modeName, OutOfTurnPolicy policy, ScenarioAnalyzer analyzer)
+        internal void SetCommon(string modeName, OutOfTurnPolicy policy, ScenarioAnalyzer analyzer, bool hints = true)
         {
             displayName = modeName;
             outOfTurnPolicy = policy;
             defaultAnalyzer = analyzer;
+            showHints = hints;
         }
     }
 }

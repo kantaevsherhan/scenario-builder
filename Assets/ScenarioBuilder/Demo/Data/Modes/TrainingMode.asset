@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: "\u0422\u0440\u0435\u043D\u0438\u0440\u043E\u0432\u043A\u0430"
   outOfTurnPolicy: 0
   defaultAnalyzer: {fileID: 11400000, guid: 4722164eff483b249af5a3eaf5329611, type: 2}
+  showHints: 1
   steps:
   - step: {fileID: 11400000, guid: ef2e2e8580693f145a935256a65dc266, type: 2}
     activation: 0

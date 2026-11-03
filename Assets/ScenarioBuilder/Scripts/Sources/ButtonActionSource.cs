@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ScenarioBuilder.Core;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ namespace ScenarioBuilder.Sources
     {
         [SerializeField, Tooltip("Действие при нажатии кнопки.")]
         private ActionDefinition action;
+
+        public override IEnumerable<ActionDefinition> Actions => new[] { action };
 
         private UnityEngine.UI.Button button;
 

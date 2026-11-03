@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using ScenarioBuilder.Activation;
 using ScenarioBuilder.Analysis;
 using ScenarioBuilder.Core;
@@ -27,13 +26,11 @@ namespace ScenarioBuilder.Demo.Editor
     {
         public const string DataFolder = "Assets/ScenarioBuilder/Demo/Data";
 
+        private static GeneratedAssetFolder folder;
+
         public static DemoAssets Build()
         {
-            if (AssetDatabase.IsValidFolder(DataFolder))
-            {
-                AssetDatabase.DeleteAsset(DataFolder);
-            }
-
+            folder = new GeneratedAssetFolder(DataFolder);
             var assets = new DemoAssets();
             CreateActions(assets);
             assets.ValveOpen = CreateAsset<StateFlag>("Flags", "ValveOpen");
@@ -47,9 +44,7 @@ namespace ScenarioBuilder.Demo.Editor
 
             assets.Scenario = CreateAsset<ScenarioDefinition>("", "DemoScenario");
             assets.Scenario.Setup("Смена оператора насосной станции", steps, new[] { training, exam });
-            EditorUtility.SetDirty(assets.Scenario);
-
-            AssetDatabase.SaveAssets();
+            folder.Finish();
             return assets;
         }
 
@@ -115,7 +110,6 @@ namespace ScenarioBuilder.Demo.Editor
         {
             ActionStep step = CreateAsset<ActionStep>("Steps", assetName);
             step.Setup(id, instruction, required, forbidden);
-            EditorUtility.SetDirty(step);
             return step;
         }
 
@@ -125,8 +119,6 @@ namespace ScenarioBuilder.Demo.Editor
             attempts.SetDisplayName("Оценка по попыткам");
             PenaltyScoreAnalyzer penalties = CreateAsset<PenaltyScoreAnalyzer>("Analyzers", "ExamScore");
             penalties.SetDisplayName("Оценка по штрафам");
-            EditorUtility.SetDirty(attempts);
-            EditorUtility.SetDirty(penalties);
             assets.Analyzers.Add(attempts);
             assets.Analyzers.Add(penalties);
 
@@ -146,21 +138,19 @@ namespace ScenarioBuilder.Demo.Editor
                 After(s[8]), With(s[9]),
                 After(s[10]), With(s[11]),
             });
-            EditorUtility.SetDirty(mode);
             return mode;
         }
 
         private static ScenarioMode CreateExam(List<StepDefinition> s, ScenarioAnalyzer analyzer)
         {
             ExamMode mode = CreateAsset<ExamMode>("Modes", "ExamMode");
-            mode.SetCommon("Экзамен", OutOfTurnPolicy.Violation, analyzer);
+            mode.SetCommon("Экзамен", OutOfTurnPolicy.Violation, analyzer, hints: false);
             mode.Setup(2, new[]
             {
                 new StepGroup("Подготовка оборудования", new[] { After(s[0]), With(s[1]), With(s[2]), With(s[3]) }),
                 new StepGroup("Обход площадки", new[] { After(s[4]), After(s[5]), After(s[6]), After(s[7]) }),
                 new StepGroup("Завершение смены", new[] { After(s[8]), With(s[9]), After(s[10]), With(s[11]) }),
             });
-            EditorUtility.SetDirty(mode);
             return mode;
         }
 
@@ -175,26 +165,7 @@ namespace ScenarioBuilder.Demo.Editor
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void EnsureFolder(string folder)
-        {
-            if (AssetDatabase.IsValidFolder(folder))
-            {
-                return;
-            }
-
-            string parent = Path.GetDirectoryName(folder).Replace('\\', '/');
-            EnsureFolder(parent);
-            AssetDatabase.CreateFolder(parent, Path.GetFileName(folder));
-        }
-
-        private static T CreateAsset<T>(string subfolder, string assetName) where T : ScriptableObject
-        {
-            string folder = string.IsNullOrEmpty(subfolder) ? DataFolder : $"{DataFolder}/{subfolder}";
-            EnsureFolder(folder);
-
-            var asset = ScriptableObject.CreateInstance<T>();
-            AssetDatabase.CreateAsset(asset, $"{folder}/{assetName}.asset");
-            return asset;
-        }
+        private static T CreateAsset<T>(string subfolder, string assetName) where T : ScriptableObject =>
+            folder.Write(subfolder, assetName, ScriptableObject.CreateInstance<T>());
     }
 }

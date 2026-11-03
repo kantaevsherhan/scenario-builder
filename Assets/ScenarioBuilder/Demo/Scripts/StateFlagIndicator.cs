@@ -50,6 +50,7 @@ namespace ScenarioBuilder.Demo
             if (targetRenderer != null)
             {
                 properties ??= new MaterialPropertyBlock();
+                targetRenderer.GetPropertyBlock(properties);
                 properties.SetColor("_Color", color);
                 targetRenderer.SetPropertyBlock(properties);
             }

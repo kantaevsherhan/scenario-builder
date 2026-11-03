@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ScenarioBuilder.Core;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ namespace ScenarioBuilder.Sources
 
         [SerializeField, Tooltip("Действие при столкновении.")]
         private ActionDefinition onCollision;
+
+        public override IEnumerable<ActionDefinition> Actions => new[] { onCollision };
 
         private void OnCollisionEnter(Collision collision)
         {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ScenarioBuilder.Core;
 using UnityEngine;
 
@@ -9,6 +10,9 @@ namespace ScenarioBuilder.Sources
     /// </summary>
     public abstract class ScenarioActionSource : ScenarioRunnerLink
     {
+        /// <summary>Actions this source can send. Feedback and hints use it to find the object of a step.</summary>
+        public abstract IEnumerable<ActionDefinition> Actions { get; }
+
         protected void Raise(ActionDefinition action)
         {
             if (action == null)

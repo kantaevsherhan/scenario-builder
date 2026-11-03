@@ -108,6 +108,32 @@ namespace ScenarioBuilder.Tests
         }
 
         [Test]
+        public void ViolationRaised_ReportsStatusAfterTheModeDecided()
+        {
+            ActionDefinition wrong = content.Action("wrong");
+            ActionStep guarded = content.Step("guarded", new[] { new RequiredAction(actions[0]) },
+                new[] { new ForbiddenAction(wrong) });
+            ScenarioSession session = Start(content.Exam(2, new StepGroup("G1", new[] { After(guarded), After(steps[1]) })));
+            StepStatus? reported = null;
+            session.ViolationRaised += (step, _) => reported = step.Status;
+
+            session.HandleAction(wrong);
+
+            Assert.That(reported, Is.EqualTo(StepStatus.Failed));
+        }
+
+        [Test]
+        public void ExpectedActions_FollowSequenceProgress()
+        {
+            ActionStep sequence = content.Step("sequence", new[] { new RequiredAction(actions[0]), new RequiredAction(actions[1]) });
+            ScenarioSession session = Start(content.Training(After(sequence)));
+
+            Assert.That(session.Steps[0].ExpectedActions, Is.EqualTo(new[] { actions[0] }));
+            session.HandleAction(actions[0]);
+            Assert.That(session.Steps[0].ExpectedActions, Is.EqualTo(new[] { actions[1] }));
+        }
+
+        [Test]
         public void Exam_ThresholdReached_SkipsRestOfGroupAndStartsNext()
         {
             var group1 = new StepGroup("G1", new[] { After(steps[0]), After(steps[1]), After(steps[2]) });

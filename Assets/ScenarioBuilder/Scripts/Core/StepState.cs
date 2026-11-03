@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using ScenarioBuilder.Steps;
 
 namespace ScenarioBuilder.Core
@@ -33,6 +35,10 @@ namespace ScenarioBuilder.Core
         public int Violations { get; internal set; }
 
         public bool IsFinished => Status is StepStatus.Completed or StepStatus.Failed or StepStatus.Skipped;
+
+        /// <summary>What the user should do next for this step; empty unless the step is active.</summary>
+        public IEnumerable<ActionDefinition> ExpectedActions =>
+            Status == StepStatus.Active ? Definition.ExpectedActions(Context) : Enumerable.Empty<ActionDefinition>();
 
         internal StepContext Context { get; }
     }

@@ -36,11 +36,16 @@ namespace ScenarioBuilder.Core
 
         public event Action<AnalysisReport> ReportReady;
 
+        /// <summary>An action came from the scene. The flag is true when the action caused a violation.</summary>
+        public event Action<ActionDefinition, bool> ActionRaised;
+
         public ScenarioDefinition Scenario => scenario;
         public ScenarioWorldState WorldState { get; } = new();
         public ScenarioSession Session { get; private set; }
         public AnalysisReport LastReport { get; private set; }
         public IReadOnlyList<ScenarioAnalyzer> Analyzers => analyzers;
+
+        private int violationCount;
 
         private ScenarioMode DefaultMode =>
             startMode != null ? startMode : scenario != null ? scenario.Modes.FirstOrDefault() : null;
@@ -68,6 +73,7 @@ namespace ScenarioBuilder.Core
             Session = new ScenarioSession(scenario.Title, mode, WorldState, () => Time.time);
             Session.EntryWritten += WriteToLoggers;
             Session.Finished += OnSessionFinished;
+            Session.ViolationRaised += CountViolation;
 
             ForEachLogger(logger => logger.BeginRun(Session.Journal));
             SessionStarted?.Invoke(Session);
@@ -76,7 +82,17 @@ namespace ScenarioBuilder.Core
 
         public void RestartRun() => StartRun(Session != null ? Session.Mode : DefaultMode);
 
-        public void RaiseAction(ActionDefinition action) => Session?.HandleAction(action);
+        public void RaiseAction(ActionDefinition action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            int violationsBefore = violationCount;
+            Session?.HandleAction(action);
+            ActionRaised?.Invoke(action, violationCount > violationsBefore);
+        }
 
         public void SetState(StateFlag flag, bool value) => WorldState.Set(flag, value);
 
@@ -117,7 +133,10 @@ namespace ScenarioBuilder.Core
 
             Session.EntryWritten -= WriteToLoggers;
             Session.Finished -= OnSessionFinished;
+            Session.ViolationRaised -= CountViolation;
         }
+
+        private void CountViolation(StepState step, string message) => violationCount++;
 
         private void WriteToLoggers(JournalEntry entry) => ForEachLogger(logger => logger.Write(entry));
 

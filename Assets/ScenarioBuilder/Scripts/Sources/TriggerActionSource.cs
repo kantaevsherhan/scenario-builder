@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ScenarioBuilder.Core;
 using UnityEngine;
 
@@ -15,6 +16,8 @@ namespace ScenarioBuilder.Sources
 
         [SerializeField, Tooltip("Действие при выходе из зоны. Можно оставить пустым.")]
         private ActionDefinition onExit;
+
+        public override IEnumerable<ActionDefinition> Actions => new[] { onEnter, onExit };
 
         private void Reset() => GetComponent<Collider>().isTrigger = true;
 

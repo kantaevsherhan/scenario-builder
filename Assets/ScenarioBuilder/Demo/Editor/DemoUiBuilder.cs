@@ -1,4 +1,5 @@
 using ScenarioBuilder.Core;
+using ScenarioBuilder.Feedback;
 using ScenarioBuilder.Sources;
 using ScenarioBuilder.UI;
 using TMPro;
@@ -16,14 +17,14 @@ namespace ScenarioBuilder.Demo.Editor
         private const float TopBarHeight = 76f;
         private const float Margin = 20f;
 
-        public static void Build(DemoAssets assets, ScenarioRunner runner, StateFlagSource valve)
+        public static void Build(DemoAssets assets, ScenarioRunner runner, DemoWorld world)
         {
             Transform canvas = CreateCanvas();
             CreateEventSystem();
 
             TopBar topBar = CreateTopBar(canvas);
             TaskPanel taskPanel = CreateTaskPanel(canvas);
-            CreateControlPanel(canvas, assets, valve);
+            CreateControlPanel(canvas, assets, world.Valve);
             MessageToast toast = CreateToast(canvas);
             ResultsPanel results = CreateResultsWindow(canvas, runner);
             JournalPanel journal = CreateJournalWindow(canvas, runner);
@@ -203,6 +204,8 @@ namespace ScenarioBuilder.Demo.Editor
             UiFactory.Size(value.gameObject, 80);
 
             Slider slider = UiFactory.Slider("PressureSlider", parent);
+            var feedback = slider.gameObject.AddComponent<ActionFeedback>();
+            SerializedWiring.Set(feedback, "graphic", slider.transform.Find("Track").GetComponent<Image>());
             var pressure = slider.gameObject.AddComponent<PressureControl>();
             SerializedWiring.Set(pressure, "slider", slider);
             SerializedWiring.Set(pressure, "valueLabel", value);
@@ -223,6 +226,7 @@ namespace ScenarioBuilder.Demo.Editor
         {
             Button button = UiFactory.Button(name, parent, label, color ?? UiFactory.ButtonColor, 50);
             SerializedWiring.Set(button.gameObject.AddComponent<ButtonActionSource>(), "action", action);
+            SerializedWiring.Set(button.gameObject.AddComponent<ActionFeedback>(), "graphic", button.targetGraphic);
             return button;
         }
 
