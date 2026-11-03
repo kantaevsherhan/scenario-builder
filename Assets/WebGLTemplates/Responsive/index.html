@@ -8,11 +8,25 @@
       html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0E121A; }
       body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #E8ECF4; }
       #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #0E121A; outline: none; }
-      #loader { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-      #loader-title { font-size: 20px; font-weight: 600; }
-      #loader-track { width: min(320px, 70vw); height: 6px; border-radius: 3px; background: #222A3A; overflow: hidden; }
-      #loader-fill { width: 0; height: 100%; background: #4FA8FF; transition: width 0.2s; }
-      #loader-note { font-size: 13px; color: #8A94A8; }
+
+      #loader { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #0E121A; }
+      #loader-box { width: min(440px, 86vw); display: flex; flex-direction: column; gap: 14px; }
+      #loader-title { font-size: 22px; font-weight: 600; }
+      #loader-stage { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+      #loader-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #2C3650; border-top-color: #4FA8FF;
+        animation: spin 0.8s linear infinite; flex: none; }
+      #loader-track { position: relative; height: 8px; border-radius: 4px; background: #222A3A; overflow: hidden; }
+      #loader-fill { width: 0; height: 100%; background: #4FA8FF; }
+      #loader-track.busy #loader-fill { width: 100%;
+        background: repeating-linear-gradient(-45deg, #4FA8FF 0 12px, #3A86D1 12px 24px); background-size: 34px 34px;
+        animation: stripes 0.8s linear infinite; }
+      #loader-numbers { display: flex; justify-content: space-between; font-size: 13px; color: #8A94A8; font-variant-numeric: tabular-nums; }
+      #loader-note { font-size: 13px; color: #8A94A8; line-height: 1.45; }
+      #loader.failed #loader-spinner { display: none; }
+      #loader.failed #loader-stage { color: #FF8A8A; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes stripes { to { background-position: 34px 0; } }
+
       #fullscreen { position: fixed; left: 50%; bottom: 8px; transform: translateX(-50%); padding: 5px 12px; border: 0; border-radius: 6px;
         background: rgba(44, 54, 80, 0.85); color: #E8ECF4; font: inherit; font-size: 13px; cursor: pointer; display: none; }
       #fullscreen:hover { background: #4FA8FF; }
@@ -21,17 +35,141 @@
   <body>
     <canvas id="unity-canvas" tabindex="-1"></canvas>
     <div id="loader">
-      <div id="loader-title">{{{ PRODUCT_NAME }}}</div>
-      <div id="loader-track"><div id="loader-fill"></div></div>
-      <div id="loader-note">Загрузка…</div>
+      <div id="loader-box">
+        <div id="loader-title">{{{ PRODUCT_NAME }}}</div>
+        <div id="loader-stage"><div id="loader-spinner"></div><span id="loader-stage-text">Скачивание…</span></div>
+        <div id="loader-track"><div id="loader-fill"></div></div>
+        <div id="loader-numbers"><span id="loader-amount">0%</span><span id="loader-eta"></span></div>
+        <div id="loader-note">Первая загрузка обычно занимает 20–40 секунд. Потом браузер берёт файлы из кэша, и всё открывается быстрее.</div>
+      </div>
     </div>
     <button id="fullscreen" type="button">На весь экран</button>
+    <script>
+      // Count the bytes of the build files as they arrive, so the page can show "N of M MB" and the speed.
+      // File sizes are written in by the build script; without them the page falls back to Unity's own progress.
+      var fileSizes = /*__BUILD_FILES__*/{};
+      var totalBytes = Object.keys(fileSizes).reduce(function (sum, name) { return sum + fileSizes[name]; }, 0);
+      var loadedBytes = 0;
+      var lastChunkAt = 0;
+      var nativeFetch = window.fetch;
+      window.fetch = function (input, init) {
+        var url = typeof input === "string" ? input : input.url;
+        return nativeFetch.call(window, input, init).then(function (response) {
+          if (url.indexOf("Build/") < 0) {
+            return response;
+          }
+
+          // 304: the file comes from the browser cache, count it whole. The response must stay bodiless.
+          if (response.status === 304) {
+            loadedBytes += fileSizes[url.split("?")[0].split("/").pop()] || 0;
+            return response;
+          }
+
+          if (response.status !== 200 || !response.body || !window.ReadableStream) {
+            return response;
+          }
+
+          var reader = response.body.getReader();
+          var counted = new ReadableStream({
+            pull: function (controller) {
+              return reader.read().then(function (chunk) {
+                if (chunk.done) {
+                  controller.close();
+                  return;
+                }
+
+                loadedBytes += chunk.value.byteLength;
+                lastChunkAt = performance.now();
+                controller.enqueue(chunk.value);
+              });
+            }
+          });
+          return new Response(counted, { status: response.status, statusText: response.statusText, headers: response.headers });
+        });
+      };
+    </script>
     <script src="Build/{{{ LOADER_FILENAME }}}"></script>
     <script>
       var canvas = document.querySelector("#unity-canvas");
-      var fill = document.querySelector("#loader-fill");
       var loader = document.querySelector("#loader");
+      var track = document.querySelector("#loader-track");
+      var fill = document.querySelector("#loader-fill");
+      var stageText = document.querySelector("#loader-stage-text");
+      var amount = document.querySelector("#loader-amount");
+      var eta = document.querySelector("#loader-eta");
       var fullscreen = document.querySelector("#fullscreen");
+
+      var unityProgress = 0;
+      var samples = [];
+
+      function megabytes(bytes) {
+        return (bytes / 1048576).toFixed(1).replace(".", ",");
+      }
+
+      function speed(received) {
+        var now = performance.now();
+        samples.push({ time: now, bytes: received });
+        while (samples.length > 2 && now - samples[0].time > 3000) {
+          samples.shift();
+        }
+
+        var first = samples[0];
+        var seconds = (now - first.time) / 1000;
+        return seconds > 0.5 ? (received - first.bytes) / seconds : 0;
+      }
+
+      function render() {
+        // Unity reports 90% before the wasm stream ends, so bytes still arriving mean we are downloading.
+        // Files served from the cache bypass the counter, then only Unity's own progress is left.
+        var streaming = loadedBytes < totalBytes && performance.now() - lastChunkAt < 1500;
+        if (unityProgress < 0.9 || streaming) {
+          var received = streaming ? loadedBytes : Math.max(loadedBytes, Math.min(unityProgress / 0.9, 1) * totalBytes);
+          var share = totalBytes > 0 ? Math.min(received / totalBytes, 1) : unityProgress / 0.9;
+          var bytesPerSecond = speed(received);
+          stageText.textContent = "Скачивание…";
+          track.classList.remove("busy");
+          fill.style.width = Math.round(share * 100) + "%";
+          amount.textContent = Math.round(share * 100) + "%" +
+            (totalBytes > 0 ? " · " + megabytes(received) + " из " + megabytes(totalBytes) + " МБ" : "");
+          if (bytesPerSecond > 0 && totalBytes > received) {
+            var left = Math.ceil((totalBytes - received) / bytesPerSecond);
+            eta.textContent = megabytes(bytesPerSecond) + " МБ/с · осталось ~" + left + " с";
+          } else {
+            eta.textContent = "";
+          }
+        } else if (unityProgress < 1) {
+          stageText.textContent = "Подготовка: компиляция и распаковка, это может занять до минуты…";
+          track.classList.add("busy");
+          amount.textContent = "Файлы получены";
+          eta.textContent = "";
+        } else {
+          stageText.textContent = "Запуск сцены…";
+          track.classList.add("busy");
+          amount.textContent = "";
+          eta.textContent = "";
+        }
+      }
+
+      var timer = setInterval(render, 250);
+
+      // Some loader failures surface only as uncaught errors, not through the promise below.
+      function failWhileLoading(event) {
+        if (document.body.contains(loader)) {
+          fail(event.reason || event.message);
+        }
+      }
+
+      window.addEventListener("error", failWhileLoading);
+      window.addEventListener("unhandledrejection", failWhileLoading);
+
+      function fail(message) {
+        clearInterval(timer);
+        loader.classList.add("failed");
+        track.classList.remove("busy");
+        stageText.textContent = "Не удалось запустить. Обновите страницу. Если не помогло, откройте в свежей версии Chrome, Edge или Firefox.";
+        amount.textContent = "";
+        eta.textContent = String(message || "").slice(0, 160);
+      }
 
       createUnityInstance(canvas, {
         arguments: [],
@@ -47,16 +185,25 @@
         companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
         productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
         productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        // Keep the wasm and framework in the browser cache too, not only the data file.
+        cacheControl: function () { return "must-revalidate"; },
+        showBanner: function (message, type) {
+          if (type === "error") {
+            fail(message);
+          }
+        },
       }, function (progress) {
-        fill.style.width = Math.round(progress * 100) + "%";
+        unityProgress = progress;
+        render();
       }).then(function (instance) {
+        clearInterval(timer);
+        window.removeEventListener("error", failWhileLoading);
+        window.removeEventListener("unhandledrejection", failWhileLoading);
         loader.remove();
         fullscreen.style.display = "block";
         fullscreen.onclick = function () { instance.SetFullscreen(1); };
         canvas.focus();
-      }).catch(function (message) {
-        document.querySelector("#loader-note").textContent = message;
-      });
+      }).catch(fail);
     </script>
   </body>
 </html>
