@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ScenarioBuilder.UI
 {
     /// <summary>Scrollable view of the current run journal. Updates live while open.</summary>
-    public sealed class JournalPanel : MonoBehaviour
+    public sealed class JournalPanel : MonoBehaviour, IClosablePanel
     {
         [SerializeField] private ScenarioRunner runner;
         [SerializeField] private GameObject root;
@@ -40,6 +40,8 @@ namespace ScenarioBuilder.UI
             root.transform.SetAsLastSibling();
             Render();
         }
+
+        public bool IsOpen => root.activeSelf;
 
         public void Hide() => root.SetActive(false);
 

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ScenarioBuilder.UI
 {
     /// <summary>Final report with per-step lines and buttons to re-score the same run with another analyzer.</summary>
-    public sealed class ResultsPanel : MonoBehaviour
+    public sealed class ResultsPanel : MonoBehaviour, IClosablePanel
     {
         [SerializeField] private ScenarioRunner runner;
         [SerializeField] private GameObject root;
@@ -43,6 +43,8 @@ namespace ScenarioBuilder.UI
         }
 
         private void OnSessionStarted(ScenarioSession session) => Hide();
+
+        public bool IsOpen => root.activeSelf;
 
         public void Hide() => root.SetActive(false);
 

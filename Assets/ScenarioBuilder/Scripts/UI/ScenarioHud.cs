@@ -20,6 +20,7 @@ namespace ScenarioBuilder.UI
         [SerializeField] private UnityEngine.UI.Button modeButtonTemplate;
         [SerializeField] private UnityEngine.UI.Button restartButton;
         [SerializeField] private UnityEngine.UI.Button journalButton;
+        [SerializeField] private UnityEngine.UI.Button quitButton;
 
         [Header("Tasks")]
         [SerializeField] private TMP_Text modeText;
@@ -50,6 +51,7 @@ namespace ScenarioBuilder.UI
             groupHeaders = new TemplateList<GroupHeaderView>(groupHeaderTemplate);
             restartButton.onClick.AddListener(runner.RestartRun);
             journalButton.onClick.AddListener(journalPanel.Show);
+            quitButton.onClick.AddListener(ApplicationExit.Quit);
             showResultsButton.onClick.AddListener(resultsPanel.ShowLastReport);
             runner.SessionStarted += OnSessionStarted;
         }

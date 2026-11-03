@@ -29,6 +29,7 @@ namespace ScenarioBuilder.Demo.Editor
             ResultsPanel results = CreateResultsWindow(canvas, runner);
             JournalPanel journal = CreateJournalWindow(canvas, runner);
             SerializedWiring.Set(results, "journalPanel", journal);
+            SerializedWiring.SetList(canvas.gameObject.AddComponent<EscapeKey>(), "panels", new Object[] { journal, results });
 
             var hud = canvas.gameObject.AddComponent<ScenarioHud>();
             SerializedWiring.Set(hud, "runner", runner);
@@ -36,6 +37,7 @@ namespace ScenarioBuilder.Demo.Editor
             SerializedWiring.Set(hud, "modeButtonTemplate", topBar.ModeButtonTemplate);
             SerializedWiring.Set(hud, "restartButton", topBar.RestartButton);
             SerializedWiring.Set(hud, "journalButton", topBar.JournalButton);
+            SerializedWiring.Set(hud, "quitButton", topBar.QuitButton);
             SerializedWiring.Set(hud, "modeText", taskPanel.ModeText);
             SerializedWiring.Set(hud, "groupText", taskPanel.GroupText);
             SerializedWiring.Set(hud, "progressText", taskPanel.ProgressText);
@@ -73,6 +75,7 @@ namespace ScenarioBuilder.Demo.Editor
             public Button ModeButtonTemplate;
             public Button RestartButton;
             public Button JournalButton;
+            public Button QuitButton;
         }
 
         private static TopBar CreateTopBar(Transform canvas)
@@ -105,6 +108,7 @@ namespace ScenarioBuilder.Demo.Editor
             UiFactory.Size(UiFactory.Rect("Gap", bar.transform).gameObject, 24);
             topBar.RestartButton = UiFactory.Button("RestartButton", bar.transform, "Заново", UiFactory.AccentColor, 48, 150);
             topBar.JournalButton = UiFactory.Button("JournalButton", bar.transform, "Журнал", UiFactory.ButtonColor, 48, 150);
+            topBar.QuitButton = UiFactory.Button("QuitButton", bar.transform, "Выход", UiFactory.ButtonColor, 48, 130);
             return topBar;
         }
 
