@@ -31,6 +31,24 @@
 - После завершения открывается окно результатов: баллы по шагам, предупреждения анализатора и кнопки
   повторной оценки этого же прохождения другим анализатором.
 
+### Сборка под Windows
+
+- **Из редактора:** меню **Build → Windows**.
+- **Из командной строки:**
+
+  ```bash
+  unity run . -- -buildTarget Win64 -executeMethod ScenarioBuilder.Build.WindowsBuild.BuildFromCommandLine
+  ```
+
+Сборка (Standalone Win64, демо-сцена первой) появляется в `Builds/Windows/ScenarioBuilder.exe`. Запустите exe:
+по умолчанию он открывается на весь экран, `Alt+F4` — выход. Для запуска в окне:
+`ScenarioBuilder.exe -screen-fullscreen 0 -screen-width 1280 -screen-height 720`.
+Чтобы передать сборку, заархивируйте всю папку `Builds/Windows` (exe не работает без `ScenarioBuilder_Data`
+и dll рядом). Папка `Builds/` не хранится в git.
+
+Журналы JSON в сборке сохраняются в `%USERPROFILE%\AppData\LocalLow\DefaultCompany\ScenarioBuilder\Journals`,
+лог игрока — `Player.log` в той же папке.
+
 ### Демо-сценарий «Смена оператора насосной станции» (12 шагов)
 
 | # | Шаг | Источник события | Особенность |
