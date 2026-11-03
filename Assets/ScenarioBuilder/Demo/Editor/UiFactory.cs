@@ -8,6 +8,7 @@ namespace ScenarioBuilder.Demo.Editor
     internal static class UiFactory
     {
         public static readonly Color PanelColor = Hex("161B26", 0.94f);
+        public static readonly Color WindowColor = Hex("161B26");
         public static readonly Color CardColor = Hex("222A3A");
         public static readonly Color ButtonColor = Hex("2C3650");
         public static readonly Color TextColor = Hex("E8ECF4");
@@ -126,7 +127,7 @@ namespace ScenarioBuilder.Demo.Editor
             check.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd");
             Stretch(check.rectTransform, 4, 4, 4, 4);
 
-            TextMeshProUGUI text = Text("Label", root, label, 19, TextColor, FontStyles.Normal, TextAlignmentOptions.MidlineLeft);
+            TextMeshProUGUI text = Text("Label", root, label, 18, TextColor, FontStyles.Normal, TextAlignmentOptions.MidlineLeft);
             Size(text.gameObject, flexibleWidth: 1);
 
             Toggle toggle = root.gameObject.AddComponent<Toggle>();

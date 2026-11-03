@@ -16,6 +16,8 @@ namespace ScenarioBuilder.Demo.Editor
     {
         private const float TopBarHeight = 76f;
         private const float Margin = 20f;
+        private const int Pad = 24;
+        private const float Gap = 12f;
 
         public static void Build(DemoAssets assets, ScenarioRunner runner, DemoWorld world)
         {
@@ -40,7 +42,7 @@ namespace ScenarioBuilder.Demo.Editor
                 Stop(topBar.ModeButtons, "Режимы",
                     "В тренировке есть подсказки и шаг можно повторить. На экзамене подсказок нет, а ошибки стоят баллов."),
                 Stop(topBar.SettingsButton.gameObject, "Настройки",
-                    "Здесь подсказки и этот тур можно выключить или пройти тур заново. Esc закрывает окна, а если их нет — выходит из приложения."),
+                    "Здесь подсказки и этот тур можно выключить или пройти тур заново. Esc закрывает окна и подсказки."),
             });
             SettingsPanel settings = CreateSettingsWindow(canvas, tour);
             UnityEventTools.AddVoidPersistentListener(topBar.SettingsButton.onClick, settings.Show);
@@ -74,7 +76,7 @@ namespace ScenarioBuilder.Demo.Editor
             var scaler = root.gameObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             root.gameObject.AddComponent<GraphicRaycaster>();
             return root;
         }
@@ -101,17 +103,19 @@ namespace ScenarioBuilder.Demo.Editor
             Image bar = UiFactory.Panel("TopBar", canvas, UiFactory.PanelColor, rounded: false);
             UiFactory.Anchor(bar.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(0.5f, 1),
                 new Vector2(0, -TopBarHeight), Vector2.zero);
-            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(bar.gameObject, 12);
-            layout.padding = new RectOffset(28, 20, 14, 14);
+            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(bar.gameObject, Gap);
+            int inset = (int)Margin + Pad;
+            layout.padding = new RectOffset(inset, inset, 14, 14);
 
-            UiFactory.Size(UiFactory.Panel("Mark", bar.transform, UiFactory.AccentColor).gameObject, 8, 40);
             TextMeshProUGUI title = UiFactory.Text("ScenarioTitle", bar.transform, "Сценарий", 26, UiFactory.TextColor, FontStyles.Bold,
                 TextAlignmentOptions.MidlineLeft);
-            title.textWrappingMode = TextWrappingModes.NoWrap;
-            UiFactory.Size(title.gameObject, flexibleWidth: 1);
+            title.enableAutoSizing = true;
+            title.fontSizeMin = 16;
+            title.fontSizeMax = 26;
+            UiFactory.Size(title.gameObject, -1, 48, flexibleWidth: 1).minWidth = 200;
 
-            UiFactory.Size(UiFactory.Text("ModeCaption", bar.transform, "Режим:", 18, UiFactory.MutedTextColor, FontStyles.Normal,
-                TextAlignmentOptions.MidlineRight).gameObject, 80);
+            UiFactory.Size(UiFactory.Text("ModeCaption", bar.transform, "Режим:", 16, UiFactory.MutedTextColor, FontStyles.Normal,
+                TextAlignmentOptions.MidlineRight).gameObject, 70);
 
             RectTransform modes = UiFactory.Rect("ModeButtons", bar.transform);
             UiFactory.HorizontalLayout(modes.gameObject, 8);
@@ -124,7 +128,7 @@ namespace ScenarioBuilder.Demo.Editor
                 ModeButtons = modes.gameObject,
             };
 
-            UiFactory.Size(UiFactory.Rect("Gap", bar.transform).gameObject, 24);
+            UiFactory.Size(UiFactory.Rect("Gap", bar.transform).gameObject, Pad);
             topBar.RestartButton = UiFactory.Button("RestartButton", bar.transform, "Заново", UiFactory.AccentColor, 48, 150);
             topBar.JournalButton = UiFactory.Button("JournalButton", bar.transform, "Журнал", UiFactory.ButtonColor, 48, 150);
             topBar.SettingsButton = UiFactory.Button("SettingsButton", bar.transform, "Настройки", UiFactory.ButtonColor, 48, 160);
@@ -149,19 +153,19 @@ namespace ScenarioBuilder.Demo.Editor
             Image panel = UiFactory.Panel("TasksPanel", canvas, UiFactory.PanelColor);
             UiFactory.Anchor(panel.rectTransform, Vector2.zero, new Vector2(0, 1), new Vector2(0, 1),
                 new Vector2(Margin, Margin), new Vector2(Margin + 440, -TopBarHeight - Margin));
-            UiFactory.VerticalLayout(panel.gameObject, 10, 22);
+            UiFactory.VerticalLayout(panel.gameObject, Gap, Pad);
 
             SectionHeader("Header", panel.transform, "ЗАДАНИЯ");
             var result = new TaskPanel
             {
                 Root = panel.gameObject,
-                ModeText = UiFactory.Text("ModeText", panel.transform, "Режим", 30, UiFactory.TextColor, FontStyles.Bold),
-                GroupText = UiFactory.Text("GroupText", panel.transform, "Группа", 18, UiFactory.MutedTextColor),
-                ProgressText = UiFactory.Text("ProgressText", panel.transform, "Завершено шагов", 18, UiFactory.MutedTextColor),
+                ModeText = UiFactory.Text("ModeText", panel.transform, "Режим", 28, UiFactory.TextColor, FontStyles.Bold),
+                GroupText = UiFactory.Text("GroupText", panel.transform, "Группа", 16, UiFactory.MutedTextColor),
+                ProgressText = UiFactory.Text("ProgressText", panel.transform, "Завершено шагов", 16, UiFactory.MutedTextColor),
             };
             UiFactory.Size(UiFactory.Panel("Separator", panel.transform, UiFactory.CardColor, rounded: false).gameObject, -1, 2);
 
-            result.StepList = UiFactory.ScrollView("StepList", panel.transform, out RectTransform steps, 6f);
+            result.StepList = UiFactory.ScrollView("StepList", panel.transform, out RectTransform steps, 8f);
             result.StepList.GetComponent<Image>().color = Color.clear;
             result.StepList.viewport.offsetMin = Vector2.zero;
             result.StepList.viewport.offsetMax = Vector2.zero;
@@ -169,28 +173,28 @@ namespace ScenarioBuilder.Demo.Editor
             result.GroupHeaderTemplate = GroupHeader(steps);
             result.StepCardTemplate = StepCard(steps);
 
-            result.ShowResultsButton = UiFactory.Button("ShowResultsButton", panel.transform, "Показать результаты", UiFactory.AccentColor, 52);
+            result.ShowResultsButton = UiFactory.Button("ShowResultsButton", panel.transform, "Показать результаты", UiFactory.AccentColor, 48);
             UiFactory.Text("ControlsHint", panel.transform,
                 "Движение: WASD или стрелки. Кнопки и ползунок — на пульте справа.",
-                15, UiFactory.MutedTextColor);
+                14, UiFactory.MutedTextColor);
             return result;
         }
 
         private static StepCardView StepCard(Transform parent)
         {
             Image card = UiFactory.Panel("StepCardTemplate", parent, UiFactory.CardColor);
-            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(card.gameObject, 12);
-            layout.padding = new RectOffset(10, 12, 9, 9);
+            HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(card.gameObject, Gap);
+            layout.padding = new RectOffset(12, 14, 10, 10);
             layout.childForceExpandHeight = true;
 
             Image accent = UiFactory.Panel("Accent", card.transform, UiFactory.AccentColor);
-            UiFactory.Size(accent.gameObject, 5);
+            UiFactory.Size(accent.gameObject, 4);
 
             RectTransform texts = UiFactory.Rect("Texts", card.transform);
-            UiFactory.VerticalLayout(texts.gameObject, 3);
+            UiFactory.VerticalLayout(texts.gameObject, 4);
             UiFactory.Size(texts.gameObject, flexibleWidth: 1);
-            TextMeshProUGUI title = UiFactory.Text("Title", texts, "Задание", 18, UiFactory.TextColor);
-            TextMeshProUGUI details = UiFactory.Text("Details", texts, "Сейчас", 13, UiFactory.AccentColor, FontStyles.Bold);
+            TextMeshProUGUI title = UiFactory.Text("Title", texts, "Задание", 17, UiFactory.TextColor);
+            TextMeshProUGUI details = UiFactory.Text("Details", texts, "Сейчас", 12, UiFactory.AccentColor, FontStyles.Bold);
             details.characterSpacing = 4;
 
             var view = card.gameObject.AddComponent<StepCardView>();
@@ -205,9 +209,9 @@ namespace ScenarioBuilder.Demo.Editor
         {
             Image background = UiFactory.Panel("GroupHeaderTemplate", parent, Color.clear);
             HorizontalLayoutGroup layout = UiFactory.HorizontalLayout(background.gameObject, 0);
-            layout.padding = new RectOffset(10, 10, 7, 7);
+            layout.padding = new RectOffset(12, 12, 8, 8);
             layout.childForceExpandWidth = true;
-            TextMeshProUGUI label = UiFactory.Text("Label", background.transform, "Группа", 16, UiFactory.MutedTextColor);
+            TextMeshProUGUI label = UiFactory.Text("Label", background.transform, "Группа", 15, UiFactory.MutedTextColor);
 
             var view = background.gameObject.AddComponent<GroupHeaderView>();
             SerializedWiring.Set(view, "label", label);
@@ -220,7 +224,7 @@ namespace ScenarioBuilder.Demo.Editor
             Image panel = UiFactory.Panel("ControlPanel", canvas, UiFactory.PanelColor);
             UiFactory.Anchor(panel.rectTransform, new Vector2(1, 0), Vector2.one, Vector2.one,
                 new Vector2(-Margin - 400, Margin), new Vector2(-Margin, -TopBarHeight - Margin));
-            UiFactory.VerticalLayout(panel.gameObject, 10, 22);
+            UiFactory.VerticalLayout(panel.gameObject, Gap, Pad);
             Transform root = panel.transform;
 
             SectionHeader("Header", root, "ПУЛЬТ УПРАВЛЕНИЯ");
@@ -275,7 +279,7 @@ namespace ScenarioBuilder.Demo.Editor
         private static Button ActionButton(Transform parent, string name, string label, ActionDefinition action,
             Color? color = null)
         {
-            Button button = UiFactory.Button(name, parent, label, color ?? UiFactory.ButtonColor, 50);
+            Button button = UiFactory.Button(name, parent, label, color ?? UiFactory.ButtonColor, 48);
             SerializedWiring.Set(button.gameObject.AddComponent<ButtonActionSource>(), "action", action);
             SerializedWiring.Set(button.gameObject.AddComponent<ActionFeedback>(), "graphic", button.targetGraphic);
             return button;
@@ -292,7 +296,7 @@ namespace ScenarioBuilder.Demo.Editor
 
             TextMeshProUGUI text = UiFactory.Text("Message", background.transform, "", 20, UiFactory.TextColor, FontStyles.Bold,
                 TextAlignmentOptions.Center);
-            UiFactory.Stretch(text.rectTransform, 20, 20, 10, 10);
+            UiFactory.Stretch(text.rectTransform, Pad, Pad, 10, 10);
             text.enableAutoSizing = true;
             text.fontSizeMin = 14;
             text.fontSizeMax = 20;
@@ -311,28 +315,28 @@ namespace ScenarioBuilder.Demo.Editor
 
             SectionHeader("Title", window, "РЕЗУЛЬТАТЫ ПРОХОЖДЕНИЯ");
             TextMeshProUGUI score = UiFactory.Text("Score", window, "0 / 0", 64, UiFactory.TextColor, FontStyles.Bold);
-            TextMeshProUGUI analyzer = UiFactory.Text("Analyzer", window, "Анализатор", 18, UiFactory.MutedTextColor);
+            TextMeshProUGUI analyzer = UiFactory.Text("Analyzer", window, "Анализатор", 16, UiFactory.MutedTextColor);
             TextMeshProUGUI warnings = UiFactory.Text("Warnings", window, "", 16, UiFactory.Hex("F5B841"));
             UiFactory.Text("ColumnsHeader", window, "Шаг<pos=72%>Статус<pos=88%>Баллы", 14, UiFactory.MutedTextColor,
                 FontStyles.Bold).margin = new Vector4(10, 0, 10, 0);
 
             ScrollRect lines = UiFactory.ScrollView("Lines", window, out RectTransform content);
             UiFactory.Size(lines.gameObject, flexibleHeight: 1);
-            TextMeshProUGUI lineTemplate = UiFactory.Text("LineTemplate", content, "Шаг", 18, UiFactory.TextColor);
+            TextMeshProUGUI lineTemplate = UiFactory.Text("LineTemplate", content, "Шаг", 17, UiFactory.TextColor);
 
-            UiFactory.Text("ReanalyzeCaption", window, "Оценить это же прохождение другим анализатором:", 16, UiFactory.MutedTextColor);
+            UiFactory.Text("ReanalyzeCaption", window, "Оценить это же прохождение другим анализатором:", 15, UiFactory.MutedTextColor);
             RectTransform analyzers = UiFactory.Rect("AnalyzerButtons", window);
-            UiFactory.HorizontalLayout(analyzers.gameObject, 10);
+            UiFactory.HorizontalLayout(analyzers.gameObject, Gap);
             UiFactory.Size(analyzers.gameObject, -1, 48);
             Button analyzerTemplate = ToggleStyleButton("AnalyzerButtonTemplate", analyzers, "Анализатор", 280);
 
             RectTransform actions = UiFactory.Rect("Actions", window);
-            UiFactory.HorizontalLayout(actions.gameObject, 10);
-            UiFactory.Size(actions.gameObject, -1, 52);
+            UiFactory.HorizontalLayout(actions.gameObject, Gap);
+            UiFactory.Size(actions.gameObject, -1, 48);
             UiFactory.Size(UiFactory.Rect("Spacer", actions).gameObject, flexibleWidth: 1);
-            Button journalButton = UiFactory.Button("JournalButton", actions, "Журнал", UiFactory.ButtonColor, 52, 170);
-            Button restartButton = UiFactory.Button("RestartButton", actions, "Пройти заново", UiFactory.AccentColor, 52, 220);
-            Button closeButton = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 52, 150);
+            Button journalButton = UiFactory.Button("JournalButton", actions, "Журнал", UiFactory.ButtonColor, 48, 170);
+            Button restartButton = UiFactory.Button("RestartButton", actions, "Пройти заново", UiFactory.AccentColor, 48, 220);
+            Button closeButton = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 48, 150);
 
             SerializedWiring.Set(panel, "runner", runner);
             SerializedWiring.Set(panel, "root", modal.Overlay);
@@ -354,16 +358,16 @@ namespace ScenarioBuilder.Demo.Editor
             Transform window = modal.Window;
 
             SectionHeader("Title", window, "ЖУРНАЛ СОБЫТИЙ");
-            TextMeshProUGUI summary = UiFactory.Text("Summary", window, "", 18, UiFactory.MutedTextColor);
+            TextMeshProUGUI summary = UiFactory.Text("Summary", window, "", 16, UiFactory.MutedTextColor);
             ScrollRect scroll = UiFactory.ScrollView("Entries", window, out RectTransform content, 0);
             UiFactory.Size(scroll.gameObject, flexibleHeight: 1);
             TextMeshProUGUI entries = UiFactory.Text("EntriesText", content, "", 15, UiFactory.TextColor);
 
             RectTransform actions = UiFactory.Rect("Actions", window);
-            UiFactory.HorizontalLayout(actions.gameObject, 10);
-            UiFactory.Size(actions.gameObject, -1, 52);
+            UiFactory.HorizontalLayout(actions.gameObject, Gap);
+            UiFactory.Size(actions.gameObject, -1, 48);
             UiFactory.Size(UiFactory.Rect("Spacer", actions).gameObject, flexibleWidth: 1);
-            Button closeButton = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 52, 150);
+            Button closeButton = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 48, 150);
 
             SerializedWiring.Set(panel, "runner", runner);
             SerializedWiring.Set(panel, "root", modal.Overlay);
@@ -406,21 +410,21 @@ namespace ScenarioBuilder.Demo.Editor
                 UiFactory.Anchor(line.rectTransform, min, max, new Vector2(0.5f, 0.5f), new Vector2(-1.5f, -1.5f), new Vector2(1.5f, 1.5f));
             }
 
-            Image callout = UiFactory.Panel("Callout", root, UiFactory.PanelColor);
+            Image callout = UiFactory.Panel("Callout", root, UiFactory.WindowColor);
             callout.rectTransform.sizeDelta = new Vector2(480, 0);
-            UiFactory.VerticalLayout(callout.gameObject, 12, 24);
+            UiFactory.VerticalLayout(callout.gameObject, Gap, Pad);
             callout.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            TextMeshProUGUI title = UiFactory.Text("Title", callout.transform, "Подсказка", 24, UiFactory.TextColor, FontStyles.Bold);
-            TextMeshProUGUI body = UiFactory.Text("Body", callout.transform, "", 19, UiFactory.TextColor);
+            TextMeshProUGUI title = UiFactory.Text("Title", callout.transform, "Подсказка", 22, UiFactory.TextColor, FontStyles.Bold);
+            TextMeshProUGUI body = UiFactory.Text("Body", callout.transform, "", 17, UiFactory.TextColor);
 
             RectTransform footer = UiFactory.Rect("Footer", callout.transform);
-            UiFactory.HorizontalLayout(footer.gameObject, 10);
-            UiFactory.Size(footer.gameObject, -1, 46);
+            UiFactory.HorizontalLayout(footer.gameObject, Gap);
+            UiFactory.Size(footer.gameObject, -1, 44);
             TextMeshProUGUI counter = UiFactory.Text("Counter", footer, "1 / 1", 14, UiFactory.MutedTextColor, FontStyles.Normal,
                 TextAlignmentOptions.MidlineLeft);
             UiFactory.Size(counter.gameObject, flexibleWidth: 1);
-            Button skip = UiFactory.Button("SkipButton", footer, "Пропустить", UiFactory.ButtonColor, 46, 150);
-            Button next = UiFactory.Button("NextButton", footer, "Далее", UiFactory.AccentColor, 46, 140);
+            Button skip = UiFactory.Button("SkipButton", footer, "Пропустить", UiFactory.ButtonColor, 44, 150);
+            Button next = UiFactory.Button("NextButton", footer, "Далее", UiFactory.AccentColor, 44, 140);
             skip.GetComponent<LayoutElement>().minWidth = 150;
             next.GetComponent<LayoutElement>().minWidth = 140;
 
@@ -467,15 +471,15 @@ namespace ScenarioBuilder.Demo.Editor
             Toggle tourToggle = UiFactory.Toggle("TourToggle", window, "Обучающий тур и подсказки по шагам");
             Toggle highlightToggle = UiFactory.Toggle("HighlightToggle", window, "Подсветка объектов текущего шага");
             UiFactory.Text("Note", window, "Подсказки работают только в режимах, где они включены (в демо — в тренировке).",
-                15, UiFactory.MutedTextColor);
+                14, UiFactory.MutedTextColor);
             UiFactory.Size(UiFactory.Rect("Spacer", window).gameObject, flexibleHeight: 1);
 
             RectTransform actions = UiFactory.Rect("Actions", window);
-            UiFactory.HorizontalLayout(actions.gameObject, 10);
-            UiFactory.Size(actions.gameObject, -1, 52);
+            UiFactory.HorizontalLayout(actions.gameObject, Gap);
+            UiFactory.Size(actions.gameObject, -1, 48);
             UiFactory.Size(UiFactory.Rect("Spacer", actions).gameObject, flexibleWidth: 1);
-            Button replay = UiFactory.Button("ReplayTourButton", actions, "Пройти тур заново", UiFactory.AccentColor, 52, 260);
-            Button close = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 52, 150);
+            Button replay = UiFactory.Button("ReplayTourButton", actions, "Пройти тур заново", UiFactory.AccentColor, 48, 260);
+            Button close = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 48, 150);
 
             SerializedWiring.Set(panel, "root", modal.Overlay);
             SerializedWiring.Set(panel, "tourToggle", tourToggle);
@@ -508,17 +512,17 @@ namespace ScenarioBuilder.Demo.Editor
             UiFactory.Stretch(dim.rectTransform);
             dim.raycastTarget = true;
 
-            Image window = UiFactory.Panel("Window", dim.transform, UiFactory.PanelColor);
+            Image window = UiFactory.Panel("Window", dim.transform, UiFactory.WindowColor);
             Vector2 half = size / 2f;
             UiFactory.Anchor(window.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 -half, half);
-            UiFactory.VerticalLayout(window.gameObject, 12, 32);
+            UiFactory.VerticalLayout(window.gameObject, Gap, Pad + 8);
             return new Modal(host.gameObject, dim.gameObject, window.transform);
         }
 
         private static void SectionHeader(string name, Transform parent, string text)
         {
-            TextMeshProUGUI header = UiFactory.Text(name, parent, text, 15, UiFactory.AccentColor, FontStyles.Bold);
+            TextMeshProUGUI header = UiFactory.Text(name, parent, text, 14, UiFactory.AccentColor, FontStyles.Bold);
             header.characterSpacing = 8;
         }
 
