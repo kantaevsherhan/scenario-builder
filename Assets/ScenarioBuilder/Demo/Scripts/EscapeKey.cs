@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace ScenarioBuilder.Demo
 {
-    /// <summary>Esc closes the first open window from the list; with nothing open it exits the application.</summary>
+    /// <summary>Esc closes the first open window from the list; with nothing open it exits the application where it can.</summary>
     public sealed class EscapeKey : MonoBehaviour
     {
         [SerializeField, Tooltip("Окна в порядке приоритета. Каждое должно реализовывать IClosablePanel.")]

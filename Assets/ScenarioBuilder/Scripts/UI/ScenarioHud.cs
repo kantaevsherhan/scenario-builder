@@ -52,6 +52,7 @@ namespace ScenarioBuilder.UI
             restartButton.onClick.AddListener(runner.RestartRun);
             journalButton.onClick.AddListener(journalPanel.Show);
             quitButton.onClick.AddListener(ApplicationExit.Quit);
+            quitButton.gameObject.SetActive(ApplicationExit.IsSupported);
             showResultsButton.onClick.AddListener(resultsPanel.ShowLastReport);
             runner.SessionStarted += OnSessionStarted;
         }
