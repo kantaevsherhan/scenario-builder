@@ -114,6 +114,29 @@ namespace ScenarioBuilder.Demo.Editor
             return button;
         }
 
+        public static Toggle Toggle(string name, Transform parent, string label)
+        {
+            RectTransform root = Rect(name, parent);
+            HorizontalLayout(root.gameObject, 14);
+            Size(root.gameObject, -1, 40);
+
+            Image box = Panel("Box", root, ButtonColor);
+            box.raycastTarget = true;
+            Size(box.gameObject, 32, 32);
+            Image check = Panel("Checkmark", box.transform, AccentColor, rounded: false);
+            check.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd");
+            Stretch(check.rectTransform, 4, 4, 4, 4);
+
+            TextMeshProUGUI text = Text("Label", root, label, 19, TextColor, FontStyles.Normal, TextAlignmentOptions.MidlineLeft);
+            Size(text.gameObject, flexibleWidth: 1);
+
+            Toggle toggle = root.gameObject.AddComponent<Toggle>();
+            toggle.targetGraphic = box;
+            toggle.graphic = check;
+            toggle.isOn = true;
+            return toggle;
+        }
+
         public static Slider Slider(string name, Transform parent)
         {
             RectTransform root = Rect(name, parent);

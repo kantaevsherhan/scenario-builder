@@ -123,7 +123,7 @@ namespace ScenarioBuilder.Demo.Editor
             Valve(assets, world);
             PowerCabinet(assets, world);
             Pump(assets, world);
-            CreatePlayer(root);
+            world.Player = CreatePlayer(root);
             return world;
         }
 
@@ -221,7 +221,7 @@ namespace ScenarioBuilder.Demo.Editor
             world.Pump = pump;
         }
 
-        private static void CreatePlayer(Transform parent)
+        private static GameObject CreatePlayer(Transform parent)
         {
             GameObject player = Primitive(PrimitiveType.Capsule, "Player", parent, new Vector3(0f, 1f, -3.8f), Vector3.one,
                 CreateMaterial("Player", "E8ECF4"));
@@ -234,6 +234,7 @@ namespace ScenarioBuilder.Demo.Editor
             player.AddComponent<PlayerMover>();
 
             WorldLabel("Вы", new Vector3(0f, 2.7f, -3.8f), player.transform, flat: false, size: 3f);
+            return player;
         }
 
         private static ActionFeedback AddFeedback(GameObject target, Renderer renderer, params ActionDefinition[] actions)
@@ -304,5 +305,6 @@ namespace ScenarioBuilder.Demo.Editor
         public Transform Cabinet;
         public GameObject Lamp;
         public Transform Pump;
+        public GameObject Player;
     }
 }

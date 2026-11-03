@@ -10,8 +10,15 @@ namespace ScenarioBuilder.Sources
     /// </summary>
     public abstract class ScenarioActionSource : ScenarioRunnerLink
     {
+        [SerializeField, TextArea(1, 2), Tooltip("Подсказка в обучающем туре: как выполнить действие. Пусто — стандартный текст.")]
+        private string hint;
+
         /// <summary>Actions this source can send. Feedback and hints use it to find the object of a step.</summary>
         public abstract IEnumerable<ActionDefinition> Actions { get; }
+
+        public string Hint => string.IsNullOrWhiteSpace(hint) ? DefaultHint : hint;
+
+        protected virtual string DefaultHint => "Выполните действие с выделенным объектом.";
 
         protected void Raise(ActionDefinition action)
         {

@@ -19,6 +19,8 @@ namespace ScenarioBuilder.Sources
 
         public override IEnumerable<ActionDefinition> Actions => new[] { onEnter, onExit };
 
+        protected override string DefaultHint => "Дойдите до выделенного места (WASD или стрелки).";
+
         private void Reset() => GetComponent<Collider>().isTrigger = true;
 
         private void OnTriggerEnter(Collider other)

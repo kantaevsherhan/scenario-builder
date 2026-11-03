@@ -13,6 +13,8 @@ namespace ScenarioBuilder.Sources
 
         public override IEnumerable<ActionDefinition> Actions => new[] { action };
 
+        protected override string DefaultHint => "Нажмите выделенную кнопку.";
+
         private UnityEngine.UI.Button button;
 
         private void Awake() => button = GetComponent<UnityEngine.UI.Button>();

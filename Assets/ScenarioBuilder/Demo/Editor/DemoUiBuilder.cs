@@ -3,6 +3,7 @@ using ScenarioBuilder.Feedback;
 using ScenarioBuilder.Sources;
 using ScenarioBuilder.UI;
 using TMPro;
+using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -24,12 +25,28 @@ namespace ScenarioBuilder.Demo.Editor
 
             TopBar topBar = CreateTopBar(canvas);
             TaskPanel taskPanel = CreateTaskPanel(canvas);
-            CreateControlPanel(canvas, assets, world.Valve);
+            GameObject controlPanel = CreateControlPanel(canvas, assets, world.Valve);
             MessageToast toast = CreateToast(canvas);
             ResultsPanel results = CreateResultsWindow(canvas, runner);
             JournalPanel journal = CreateJournalWindow(canvas, runner);
             SerializedWiring.Set(results, "journalPanel", journal);
-            SerializedWiring.SetList(canvas.gameObject.AddComponent<EscapeKey>(), "panels", new Object[] { journal, results });
+            GuidedTour tour = CreateTour(canvas, runner, new[]
+            {
+                Stop(taskPanel.Root, "Список заданий",
+                    "Здесь все шаги смены. Синим выделены те, что нужно сделать сейчас, зелёным — выполненные, красным — ошибки."),
+                Stop(controlPanel, "Пульт управления",
+                    "Кнопки и ползунок отправляют действия. Кнопка, которую ждёт текущий шаг, мигает синим."),
+                Stop(world.Player, "Это вы",
+                    "Двигайтесь клавишами WASD или стрелками: заходите в зоны и касайтесь стоек."),
+                Stop(topBar.ModeButtons, "Режимы",
+                    "В тренировке есть подсказки и шаг можно повторить. На экзамене подсказок нет, а ошибки стоят баллов."),
+                Stop(topBar.SettingsButton.gameObject, "Настройки",
+                    "Здесь подсказки и этот тур можно выключить или пройти тур заново. Esc закрывает окна, а если их нет — выходит из приложения."),
+            });
+            SettingsPanel settings = CreateSettingsWindow(canvas, tour);
+            UnityEventTools.AddVoidPersistentListener(topBar.SettingsButton.onClick, settings.Show);
+            SerializedWiring.SetList(canvas.gameObject.AddComponent<EscapeKey>(), "panels",
+                new Object[] { tour, settings, journal, results });
 
             var hud = canvas.gameObject.AddComponent<ScenarioHud>();
             SerializedWiring.Set(hud, "runner", runner);
@@ -76,6 +93,8 @@ namespace ScenarioBuilder.Demo.Editor
             public Button RestartButton;
             public Button JournalButton;
             public Button QuitButton;
+            public Button SettingsButton;
+            public GameObject ModeButtons;
         }
 
         private static TopBar CreateTopBar(Transform canvas)
@@ -103,11 +122,13 @@ namespace ScenarioBuilder.Demo.Editor
             {
                 Title = title,
                 ModeButtonTemplate = ToggleStyleButton("ModeButtonTemplate", modes, "Режим", 170),
+                ModeButtons = modes.gameObject,
             };
 
             UiFactory.Size(UiFactory.Rect("Gap", bar.transform).gameObject, 24);
             topBar.RestartButton = UiFactory.Button("RestartButton", bar.transform, "Заново", UiFactory.AccentColor, 48, 150);
             topBar.JournalButton = UiFactory.Button("JournalButton", bar.transform, "Журнал", UiFactory.ButtonColor, 48, 150);
+            topBar.SettingsButton = UiFactory.Button("SettingsButton", bar.transform, "Настройки", UiFactory.ButtonColor, 48, 160);
             topBar.QuitButton = UiFactory.Button("QuitButton", bar.transform, "Выход", UiFactory.ButtonColor, 48, 130);
             return topBar;
         }
@@ -120,6 +141,7 @@ namespace ScenarioBuilder.Demo.Editor
             public StepCardView StepCardTemplate;
             public GroupHeaderView GroupHeaderTemplate;
             public ScrollRect StepList;
+            public GameObject Root;
             public Button ShowResultsButton;
         }
 
@@ -133,6 +155,7 @@ namespace ScenarioBuilder.Demo.Editor
             SectionHeader("Header", panel.transform, "ЗАДАНИЯ");
             var result = new TaskPanel
             {
+                Root = panel.gameObject,
                 ModeText = UiFactory.Text("ModeText", panel.transform, "Режим", 30, UiFactory.TextColor, FontStyles.Bold),
                 GroupText = UiFactory.Text("GroupText", panel.transform, "Группа", 18, UiFactory.MutedTextColor),
                 ProgressText = UiFactory.Text("ProgressText", panel.transform, "Завершено шагов", 18, UiFactory.MutedTextColor),
@@ -193,7 +216,7 @@ namespace ScenarioBuilder.Demo.Editor
             return view;
         }
 
-        private static void CreateControlPanel(Transform canvas, DemoAssets assets, StateFlagSource valve)
+        private static GameObject CreateControlPanel(Transform canvas, DemoAssets assets, StateFlagSource valve)
         {
             Image panel = UiFactory.Panel("ControlPanel", canvas, UiFactory.PanelColor);
             UiFactory.Anchor(panel.rectTransform, new Vector2(1, 0), Vector2.one, Vector2.one,
@@ -217,6 +240,7 @@ namespace ScenarioBuilder.Demo.Editor
             UiFactory.Size(UiFactory.Rect("Spacer", root).gameObject, flexibleHeight: 1);
             ActionButton(root, "FinishButton", "Завершить смену", assets.Actions["PressFinish"], UiFactory.AccentColor);
             ActionButton(root, "EmergencyButton", "Аварийный стоп", assets.Actions["PressEmergency"], UiFactory.DangerColor);
+            return panel.gameObject;
         }
 
         private static void CreatePressureControl(Transform parent, DemoAssets assets)
@@ -238,10 +262,12 @@ namespace ScenarioBuilder.Demo.Editor
 
             var maxSource = slider.gameObject.AddComponent<UnityEventActionSource>();
             SerializedWiring.Set(maxSource, "action", assets.Actions["PressureMax"]);
+            SerializedWiring.Set(maxSource, "hint", "Передвиньте ползунок «Давление» вправо до 100%.");
             UnityEventTools.AddVoidPersistentListener(pressure.ReachedMax, maxSource.RaiseAction);
 
             var minSource = slider.gameObject.AddComponent<UnityEventActionSource>();
             SerializedWiring.Set(minSource, "action", assets.Actions["PressureZero"]);
+            SerializedWiring.Set(minSource, "hint", "Передвиньте ползунок «Давление» влево до 0%.");
             UnityEventTools.AddVoidPersistentListener(pressure.ReachedMin, minSource.RaiseAction);
 
             UiFactory.Text("PressureHint", parent, "100% — поднять давление, 0% — сбросить", 14, UiFactory.MutedTextColor);
@@ -346,6 +372,118 @@ namespace ScenarioBuilder.Demo.Editor
             SerializedWiring.Set(panel, "summary", summary);
             SerializedWiring.Set(panel, "scroll", scroll);
             SerializedWiring.Set(panel, "closeButton", closeButton);
+            return panel;
+        }
+
+        private static (GameObject Target, string Title, string Text) Stop(GameObject target, string title, string text) =>
+            (target, title, text);
+
+        private static GuidedTour CreateTour(Transform canvas, ScenarioRunner runner,
+            (GameObject Target, string Title, string Text)[] stops)
+        {
+            RectTransform host = UiFactory.Stretch(UiFactory.Rect("GuidedTour", canvas));
+            RectTransform root = UiFactory.Stretch(UiFactory.Rect("Spotlight", host));
+            var dim = new Color(0f, 0f, 0f, 0.66f);
+            RectTransform DimPanel(string name)
+            {
+                Image image = UiFactory.Panel(name, root, dim, rounded: false);
+                image.raycastTarget = true;
+                return image.rectTransform;
+            }
+
+            RectTransform top = DimPanel("DimTop");
+            RectTransform bottom = DimPanel("DimBottom");
+            RectTransform left = DimPanel("DimLeft");
+            RectTransform right = DimPanel("DimRight");
+
+            RectTransform frame = UiFactory.Rect("Frame", root);
+            foreach ((string name, Vector2 min, Vector2 max) in new[]
+            {
+                ("Top", new Vector2(0, 1), Vector2.one), ("Bottom", Vector2.zero, new Vector2(1, 0)),
+                ("Left", Vector2.zero, new Vector2(0, 1)), ("Right", new Vector2(1, 0), Vector2.one),
+            })
+            {
+                Image line = UiFactory.Panel(name, frame, UiFactory.AccentColor, rounded: false);
+                UiFactory.Anchor(line.rectTransform, min, max, new Vector2(0.5f, 0.5f), new Vector2(-1.5f, -1.5f), new Vector2(1.5f, 1.5f));
+            }
+
+            Image callout = UiFactory.Panel("Callout", root, UiFactory.PanelColor);
+            callout.rectTransform.sizeDelta = new Vector2(480, 0);
+            UiFactory.VerticalLayout(callout.gameObject, 12, 24);
+            callout.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            TextMeshProUGUI title = UiFactory.Text("Title", callout.transform, "Подсказка", 24, UiFactory.TextColor, FontStyles.Bold);
+            TextMeshProUGUI body = UiFactory.Text("Body", callout.transform, "", 19, UiFactory.TextColor);
+
+            RectTransform footer = UiFactory.Rect("Footer", callout.transform);
+            UiFactory.HorizontalLayout(footer.gameObject, 10);
+            UiFactory.Size(footer.gameObject, -1, 46);
+            TextMeshProUGUI counter = UiFactory.Text("Counter", footer, "1 / 1", 14, UiFactory.MutedTextColor, FontStyles.Normal,
+                TextAlignmentOptions.MidlineLeft);
+            UiFactory.Size(counter.gameObject, flexibleWidth: 1);
+            Button skip = UiFactory.Button("SkipButton", footer, "Пропустить", UiFactory.ButtonColor, 46, 150);
+            Button next = UiFactory.Button("NextButton", footer, "Далее", UiFactory.AccentColor, 46, 140);
+            skip.GetComponent<LayoutElement>().minWidth = 150;
+            next.GetComponent<LayoutElement>().minWidth = 140;
+
+            var view = host.gameObject.AddComponent<SpotlightView>();
+            SerializedWiring.Set(view, "root", root);
+            SerializedWiring.Set(view, "top", top);
+            SerializedWiring.Set(view, "bottom", bottom);
+            SerializedWiring.Set(view, "left", left);
+            SerializedWiring.Set(view, "right", right);
+            SerializedWiring.Set(view, "frame", frame);
+            SerializedWiring.Set(view, "callout", callout.rectTransform);
+            SerializedWiring.Set(view, "title", title);
+            SerializedWiring.Set(view, "body", body);
+            SerializedWiring.Set(view, "counter", counter);
+            SerializedWiring.Set(view, "nextButton", next);
+            SerializedWiring.Set(view, "nextLabel", next.GetComponentInChildren<TMP_Text>());
+            SerializedWiring.Set(view, "skipButton", skip);
+
+            var tour = host.gameObject.AddComponent<GuidedTour>();
+            SerializedWiring.Set(tour, "runner", runner);
+            SerializedWiring.Set(tour, "view", view);
+            var serialized = new SerializedObject(tour);
+            SerializedProperty intro = serialized.FindProperty("intro");
+            intro.arraySize = stops.Length;
+            for (int i = 0; i < stops.Length; i++)
+            {
+                SerializedProperty stop = intro.GetArrayElementAtIndex(i);
+                stop.FindPropertyRelative("target").objectReferenceValue = stops[i].Target;
+                stop.FindPropertyRelative("title").stringValue = stops[i].Title;
+                stop.FindPropertyRelative("text").stringValue = stops[i].Text;
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return tour;
+        }
+
+        private static SettingsPanel CreateSettingsWindow(Transform canvas, GuidedTour tour)
+        {
+            Modal modal = ModalWindow("SettingsPanel", canvas, new Vector2(720, 360));
+            var panel = modal.Host.AddComponent<SettingsPanel>();
+            Transform window = modal.Window;
+
+            SectionHeader("Title", window, "НАСТРОЙКИ");
+            Toggle tourToggle = UiFactory.Toggle("TourToggle", window, "Обучающий тур и подсказки по шагам");
+            Toggle highlightToggle = UiFactory.Toggle("HighlightToggle", window, "Подсветка объектов текущего шага");
+            UiFactory.Text("Note", window, "Подсказки работают только в режимах, где они включены (в демо — в тренировке).",
+                15, UiFactory.MutedTextColor);
+            UiFactory.Size(UiFactory.Rect("Spacer", window).gameObject, flexibleHeight: 1);
+
+            RectTransform actions = UiFactory.Rect("Actions", window);
+            UiFactory.HorizontalLayout(actions.gameObject, 10);
+            UiFactory.Size(actions.gameObject, -1, 52);
+            UiFactory.Size(UiFactory.Rect("Spacer", actions).gameObject, flexibleWidth: 1);
+            Button replay = UiFactory.Button("ReplayTourButton", actions, "Пройти тур заново", UiFactory.AccentColor, 52, 260);
+            Button close = UiFactory.Button("CloseButton", actions, "Закрыть", UiFactory.ButtonColor, 52, 150);
+
+            SerializedWiring.Set(panel, "root", modal.Overlay);
+            SerializedWiring.Set(panel, "tourToggle", tourToggle);
+            SerializedWiring.Set(panel, "highlightToggle", highlightToggle);
+            SerializedWiring.Set(panel, "replayTourButton", replay);
+            SerializedWiring.Set(panel, "closeButton", close);
+            SerializedWiring.Set(panel, "tour", tour);
             return panel;
         }
 

@@ -16,6 +16,8 @@ namespace ScenarioBuilder.Sources
 
         public override IEnumerable<ActionDefinition> Actions => new[] { onCollision };
 
+        protected override string DefaultHint => "Подойдите и коснитесь выделенного объекта (WASD или стрелки).";
+
         private void OnCollisionEnter(Collision collision)
         {
             if (string.IsNullOrEmpty(requiredTag) || collision.gameObject.CompareTag(requiredTag))
