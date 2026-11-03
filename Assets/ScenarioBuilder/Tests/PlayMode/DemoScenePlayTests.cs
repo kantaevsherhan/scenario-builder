@@ -76,6 +76,27 @@ namespace ScenarioBuilder.Tests
         }
 
         [UnityTest]
+        public IEnumerator TrainingRun_FirstSecondThirdAttempt_Gives10Plus5Plus0()
+        {
+            runner.StartRun(Mode("Тренировка"));
+
+            Click("LightsButton");
+            Click("StartPumpButton");
+            Click("OpenValveButton");
+            Click("EmergencyButton");
+            Click("EmergencyButton");
+            Click("PowerButton");
+            yield return null;
+
+            AnalysisReport report = runner.Analyze(runner.DefaultAnalyzerFor(runner.Session.Mode));
+            int Points(string stepId) => report.Lines.Single(line => line.StepId == stepId).Points;
+            Assert.That(Points("lights"), Is.EqualTo(10));
+            Assert.That(Points("open-valve"), Is.EqualTo(5));
+            Assert.That(Points("power"), Is.EqualTo(0));
+            Assert.That(report.Warnings, Has.Some.Contains("не завершено"), "The run is still going, the score is preliminary.");
+        }
+
+        [UnityTest]
         public IEnumerator ExamRun_TwoViolationsInFirstGroup_Gives70()
         {
             runner.StartRun(Mode("Экзамен"));
