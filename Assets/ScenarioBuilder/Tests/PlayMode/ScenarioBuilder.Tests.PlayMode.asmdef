@@ -5,7 +5,8 @@
         "ScenarioBuilder.Runtime",
         "UnityEngine.UI",
         "UnityEngine.TestRunner",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

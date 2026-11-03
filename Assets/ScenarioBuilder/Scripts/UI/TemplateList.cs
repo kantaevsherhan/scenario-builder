@@ -15,6 +15,8 @@ namespace ScenarioBuilder.UI
             template.gameObject.SetActive(false);
         }
 
+        public T this[int index] => items[index];
+
         public T Add()
         {
             T item = Object.Instantiate(template, template.transform.parent);

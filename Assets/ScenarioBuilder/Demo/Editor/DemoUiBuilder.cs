@@ -45,6 +45,7 @@ namespace ScenarioBuilder.Demo.Editor
                     "Здесь подсказки и этот тур можно выключить или пройти тур заново. Esc закрывает окна и подсказки."),
             });
             SettingsPanel settings = CreateSettingsWindow(canvas, tour);
+            CreateStartScreen(canvas, runner);
             UnityEventTools.AddVoidPersistentListener(topBar.SettingsButton.onClick, settings.Show);
             SerializedWiring.SetList(canvas.gameObject.AddComponent<EscapeKey>(), "panels",
                 new Object[] { tour, settings, journal, results });
@@ -159,9 +160,9 @@ namespace ScenarioBuilder.Demo.Editor
             var result = new TaskPanel
             {
                 Root = panel.gameObject,
-                ModeText = UiFactory.Text("ModeText", panel.transform, "Режим", 28, UiFactory.TextColor, FontStyles.Bold),
-                GroupText = UiFactory.Text("GroupText", panel.transform, "Группа", 16, UiFactory.MutedTextColor),
-                ProgressText = UiFactory.Text("ProgressText", panel.transform, "Завершено шагов", 16, UiFactory.MutedTextColor),
+                ModeText = UiFactory.Text("ModeText", panel.transform, "", 28, UiFactory.TextColor, FontStyles.Bold),
+                GroupText = UiFactory.Text("GroupText", panel.transform, "", 16, UiFactory.MutedTextColor),
+                ProgressText = UiFactory.Text("ProgressText", panel.transform, "", 16, UiFactory.MutedTextColor),
             };
             UiFactory.Size(UiFactory.Panel("Separator", panel.transform, UiFactory.CardColor, rounded: false).gameObject, -1, 2);
 
@@ -174,6 +175,7 @@ namespace ScenarioBuilder.Demo.Editor
             result.StepCardTemplate = StepCard(steps);
 
             result.ShowResultsButton = UiFactory.Button("ShowResultsButton", panel.transform, "Показать результаты", UiFactory.AccentColor, 48);
+            result.ShowResultsButton.gameObject.SetActive(false);
             UiFactory.Text("ControlsHint", panel.transform,
                 "Движение: WASD или стрелки. Кнопки и ползунок — на пульте справа.",
                 14, UiFactory.MutedTextColor);
@@ -459,6 +461,44 @@ namespace ScenarioBuilder.Demo.Editor
 
             serialized.ApplyModifiedPropertiesWithoutUndo();
             return tour;
+        }
+
+        private static void CreateStartScreen(Transform canvas, ScenarioRunner runner)
+        {
+            Modal modal = ModalWindow("StartScreen", canvas, new Vector2(860, 520));
+            modal.Overlay.GetComponent<Image>().color = new Color(0.03f, 0.05f, 0.08f, 0.97f);
+            var screen = modal.Host.AddComponent<StartScreen>();
+            Transform window = modal.Window;
+
+            SectionHeader("Caption", window, "УЧЕБНЫЙ СЦЕНАРИЙ");
+            TextMeshProUGUI title = UiFactory.Text("Title", window, "Сценарий", 36, UiFactory.TextColor, FontStyles.Bold);
+            UiFactory.Text("About", window,
+                "Вы оператор насосной станции. Слева список шагов смены, справа пульт. Нажимайте кнопки на пульте, " +
+                "ходите клавишами WASD или стрелками, заходите в зоны и касайтесь стоек.",
+                18, UiFactory.TextColor);
+
+            UiFactory.Size(UiFactory.Rect("Gap", window).gameObject, -1, 4);
+            UiFactory.Text("ModeCaption", window, "Режим", 16, UiFactory.MutedTextColor, FontStyles.Bold);
+            RectTransform modes = UiFactory.Rect("ModeButtons", window);
+            UiFactory.HorizontalLayout(modes.gameObject, Gap);
+            UiFactory.Size(modes.gameObject, -1, 48);
+            Button modeTemplate = ToggleStyleButton("ModeButtonTemplate", modes, "Режим", 220);
+            TextMeshProUGUI description = UiFactory.Text("ModeDescription", window, "", 16, UiFactory.MutedTextColor);
+            UiFactory.Size(description.gameObject, -1, 52);
+
+            UiFactory.Size(UiFactory.Rect("Spacer", window).gameObject, flexibleHeight: 1);
+            RectTransform actions = UiFactory.Rect("Actions", window);
+            UiFactory.HorizontalLayout(actions.gameObject, 0).childAlignment = TextAnchor.MiddleCenter;
+            UiFactory.Size(actions.gameObject, -1, 68);
+            Button play = UiFactory.Button("PlayButton", actions, "Играть", UiFactory.PlayColor, 68, 320);
+            play.GetComponentInChildren<TMP_Text>().fontSize = 28;
+
+            SerializedWiring.Set(screen, "runner", runner);
+            SerializedWiring.Set(screen, "root", modal.Overlay);
+            SerializedWiring.Set(screen, "title", title);
+            SerializedWiring.Set(screen, "modeDescription", description);
+            SerializedWiring.Set(screen, "modeButtonTemplate", modeTemplate);
+            SerializedWiring.Set(screen, "playButton", play);
         }
 
         private static SettingsPanel CreateSettingsWindow(Transform canvas, GuidedTour tour)

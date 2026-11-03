@@ -37,7 +37,7 @@ namespace ScenarioBuilder.Demo
 
         private void FixedUpdate()
         {
-            Vector2 input = ReadInput();
+            Vector2 input = Runner != null && Runner.Session != null ? ReadInput() : Vector2.zero;
             Vector3 velocity = new Vector3(input.x, 0f, input.y) * speed;
             body.linearVelocity = new Vector3(velocity.x, body.linearVelocity.y, velocity.z);
         }

@@ -30,6 +30,28 @@ namespace ScenarioBuilder.Tests
         }
 
         [UnityTest]
+        public IEnumerator BeforePlay_NothingRuns_ThenPlayStartsTheChosenMode()
+        {
+            var startScreen = Object.FindAnyObjectByType<UI.StartScreen>();
+            Assert.That(startScreen.IsOpen, Is.True);
+            Assert.That(runner.Session, Is.Null);
+
+            Click("PowerButton");
+            Assert.That(runner.Session, Is.Null, "Actions before Play must not start or log anything.");
+
+            Object.FindObjectsByType<UnityEngine.UI.Button>()
+                .First(button => button.GetComponentInParent<UI.StartScreen>() != null &&
+                                 button.GetComponentInChildren<TMPro.TMP_Text>().text == "Экзамен")
+                .onClick.Invoke();
+            Click("PlayButton");
+            yield return null;
+
+            Assert.That(startScreen.IsOpen, Is.False);
+            Assert.That(runner.Session.Mode.DisplayName, Is.EqualTo("Экзамен"));
+            Assert.That(runner.Session.Journal.Entries.Count(entry => entry.Type == Logging.JournalEventTypes.ActionReceived), Is.Zero);
+        }
+
+        [UnityTest]
         public IEnumerator TrainingRun_AllStepsFirstTry_GivesMaximum()
         {
             runner.StartRun(Mode("Тренировка"));

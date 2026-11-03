@@ -98,6 +98,7 @@ namespace ScenarioBuilder.Demo.Editor
             var runner = new GameObject("ScenarioRunner").AddComponent<ScenarioRunner>();
             SerializedWiring.Set(runner, "scenario", assets.Scenario);
             SerializedWiring.Set(runner, "startMode", assets.TrainingMode);
+            SerializedWiring.Set(runner, "startOnPlay", false);
             SerializedWiring.SetList(runner, "analyzers", assets.Analyzers.Cast<Object>().ToList());
             SerializedWiring.SetList(runner, "loggers", assets.Loggers.Cast<Object>().ToList());
             return runner;

@@ -35,6 +35,10 @@ namespace ScenarioBuilder.Tests
             yield return null;
             runner = Object.FindAnyObjectByType<ScenarioRunner>();
             tour = Object.FindAnyObjectByType<GuidedTour>();
+            Assert.That(runner.Session, Is.Null, "Nothing should run before Play.");
+            yield return Click("PlayButton");
+            Assert.That(runner.Session, Is.Not.Null);
+            Assert.That(runner.Session.Mode.DisplayName, Is.EqualTo("Тренировка"));
         }
 
         [TearDown]

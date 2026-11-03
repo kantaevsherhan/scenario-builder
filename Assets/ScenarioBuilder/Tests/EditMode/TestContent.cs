@@ -40,7 +40,7 @@ namespace ScenarioBuilder.Tests
         public TrainingMode Training(OutOfTurnPolicy policy, params ActivationEntry[] order)
         {
             var mode = Create<TrainingMode>("Training");
-            mode.SetCommon("Training", policy, null);
+            mode.SetCommon("Training", string.Empty, policy, null);
             mode.Setup(order);
             return mode;
         }
@@ -48,7 +48,7 @@ namespace ScenarioBuilder.Tests
         public ExamMode Exam(int threshold, params StepGroup[] groups)
         {
             var mode = Create<ExamMode>("Exam");
-            mode.SetCommon("Exam", OutOfTurnPolicy.Violation, null);
+            mode.SetCommon("Exam", string.Empty, OutOfTurnPolicy.Violation, null);
             mode.Setup(threshold, groups);
             return mode;
         }

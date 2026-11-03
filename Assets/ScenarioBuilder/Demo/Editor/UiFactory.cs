@@ -15,6 +15,7 @@ namespace ScenarioBuilder.Demo.Editor
         public static readonly Color MutedTextColor = Hex("8A94A8");
         public static readonly Color AccentColor = Hex("4FA8FF");
         public static readonly Color DangerColor = Hex("B83A3A");
+        public static readonly Color PlayColor = Hex("2E9E5B");
 
         private static Sprite roundedSprite;
         private static Sprite RoundedSprite =>

@@ -21,7 +21,7 @@ namespace ScenarioBuilder.Core
         [SerializeField, Tooltip("Режим при запуске сцены. Пусто — первый режим сценария.")]
         private ScenarioMode startMode;
 
-        [SerializeField, Tooltip("Запускать сценарий автоматически при старте сцены.")]
+        [SerializeField, Tooltip("Запускать сценарий сразу при старте сцены. Выключите, если прохождение начинается с кнопки (стартовый экран).")]
         private bool startOnPlay = true;
 
         [SerializeField, Tooltip("Анализаторы, доступные для оценки и повторной оценки. " +
@@ -40,15 +40,15 @@ namespace ScenarioBuilder.Core
         public event Action<ActionDefinition, bool> ActionRaised;
 
         public ScenarioDefinition Scenario => scenario;
+        public ScenarioMode DefaultMode =>
+            startMode != null ? startMode : scenario != null ? scenario.Modes.FirstOrDefault() : null;
+
         public ScenarioWorldState WorldState { get; } = new();
         public ScenarioSession Session { get; private set; }
         public AnalysisReport LastReport { get; private set; }
         public IReadOnlyList<ScenarioAnalyzer> Analyzers => analyzers;
 
         private int violationCount;
-
-        private ScenarioMode DefaultMode =>
-            startMode != null ? startMode : scenario != null ? scenario.Modes.FirstOrDefault() : null;
 
         private void Start()
         {
@@ -84,7 +84,8 @@ namespace ScenarioBuilder.Core
 
         public void RaiseAction(ActionDefinition action)
         {
-            if (action == null)
+            // Before the first run the scene is idle: nothing is scored, logged or played.
+            if (action == null || Session == null)
             {
                 return;
             }

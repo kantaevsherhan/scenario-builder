@@ -129,7 +129,10 @@ namespace ScenarioBuilder.Demo.Editor
         private static ScenarioMode CreateTraining(List<StepDefinition> s, ScenarioAnalyzer analyzer)
         {
             TrainingMode mode = CreateAsset<TrainingMode>("Modes", "TrainingMode");
-            mode.SetCommon("Тренировка", OutOfTurnPolicy.Violation, analyzer);
+            mode.SetCommon("Тренировка",
+                "Подсказки включены. Ошибку можно исправить: шаг остаётся открытым, пока вы его не выполните. " +
+                "Баллы зависят от числа попыток.",
+                OutOfTurnPolicy.Violation, analyzer);
             mode.Setup(new[]
             {
                 After(s[0]), With(s[1]), With(s[2]), With(s[3]),
@@ -143,7 +146,10 @@ namespace ScenarioBuilder.Demo.Editor
         private static ScenarioMode CreateExam(List<StepDefinition> s, ScenarioAnalyzer analyzer)
         {
             ExamMode mode = CreateAsset<ExamMode>("Modes", "ExamMode");
-            mode.SetCommon("Экзамен", OutOfTurnPolicy.Violation, analyzer, hints: false);
+            mode.SetCommon("Экзамен",
+                "Подсказок нет. Шаг с ошибкой проваливается, после второй ошибки в группе её остаток пропускается. " +
+                "Каждый провал и пропуск снимает баллы.",
+                OutOfTurnPolicy.Violation, analyzer, hints: false);
             mode.Setup(2, new[]
             {
                 new StepGroup("Подготовка оборудования", new[] { After(s[0]), With(s[1]), With(s[2]), With(s[3]) }),

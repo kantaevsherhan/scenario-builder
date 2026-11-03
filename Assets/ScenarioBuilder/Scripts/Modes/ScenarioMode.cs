@@ -36,6 +36,9 @@ namespace ScenarioBuilder.Modes
         [SerializeField, Tooltip("Название режима для интерфейса и журнала.")]
         private string displayName;
 
+        [SerializeField, TextArea(2, 4), Tooltip("Пара фраз о режиме для стартового экрана.")]
+        private string description;
+
         [SerializeField, Tooltip("Что делать с действием, относящимся к шагу, очередь которого ещё не наступила.")]
         private OutOfTurnPolicy outOfTurnPolicy = OutOfTurnPolicy.Violation;
 
@@ -47,6 +50,7 @@ namespace ScenarioBuilder.Modes
         private bool showHints = true;
 
         public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+        public string Description => description;
         public OutOfTurnPolicy OutOfTurnPolicy => outOfTurnPolicy;
         public ScenarioAnalyzer DefaultAnalyzer => defaultAnalyzer;
         public bool ShowHints => showHints;
@@ -57,9 +61,10 @@ namespace ScenarioBuilder.Modes
         /// <param name="violationsInGroup">Violations in the current group including this one.</param>
         public abstract ViolationResponse ResolveViolation(int violationsInGroup);
 
-        internal void SetCommon(string modeName, OutOfTurnPolicy policy, ScenarioAnalyzer analyzer, bool hints = true)
+        internal void SetCommon(string modeName, string about, OutOfTurnPolicy policy, ScenarioAnalyzer analyzer, bool hints = true)
         {
             displayName = modeName;
+            description = about;
             outOfTurnPolicy = policy;
             defaultAnalyzer = analyzer;
             showHints = hints;
