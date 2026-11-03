@@ -7,11 +7,15 @@
 
 Веб-версия: https://kantaevsherhan.github.io/scenario-builder/
 
-![Тренировка](Docs/Screenshots/training.png)
+![Сценарий в редакторе Unity](Docs/Screenshots/editor.png)
 
-| Обучающий тур | Экзамен: нарушение | Результаты | Журнал |
-|---|---|---|---|
-| ![](Docs/Screenshots/tour.png) | ![](Docs/Screenshots/violation.png) | ![](Docs/Screenshots/results.png) | ![](Docs/Screenshots/journal.png) |
+Так сценарий выглядит в редакторе: выделяете `DemoScenario` в Project, и в Inspector видны шаги,
+режимы и таблица «Где какой шаг». Порядок шагов меняется перетаскиванием, режимы и группы
+настраиваются там же, код не трогается.
+
+| Тренировка | Обучающий тур | Экзамен: нарушение | Результаты | Журнал |
+|---|---|---|---|---|
+| ![](Docs/Screenshots/training.png) | ![](Docs/Screenshots/tour.png) | ![](Docs/Screenshots/violation.png) | ![](Docs/Screenshots/results.png) | ![](Docs/Screenshots/journal.png) |
 
 - Unity 6000.6.7f1, встроенный конвейер рендера, Input System, uGUI и TextMesh Pro.
 - Сторонних ассетов и плагинов нет.
