@@ -144,6 +144,7 @@ namespace ScenarioBuilder.Demo.Editor
 
             Image track = Panel("Track", root, CardColor);
             Stretch(track.rectTransform, 0, 0, 9, 9);
+            track.raycastTarget = true;
 
             RectTransform fillArea = Stretch(Rect("FillArea", root), 0, 0, 9, 9);
             Image fill = Panel("Fill", fillArea, AccentColor);
