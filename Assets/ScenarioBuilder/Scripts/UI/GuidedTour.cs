@@ -117,7 +117,7 @@ namespace ScenarioBuilder.UI
         private void OnSessionStarted(ScenarioSession newSession)
         {
             SetSession(newSession);
-            sources = FindObjectsByType<ScenarioActionSource>(FindObjectsSortMode.None);
+            sources = FindObjectsByType<ScenarioActionSource>();
             hinted.Clear();
             introIndex = -1;
             hintIndex = -1;
