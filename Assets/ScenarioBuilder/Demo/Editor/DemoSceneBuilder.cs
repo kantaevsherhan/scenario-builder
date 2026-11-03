@@ -87,6 +87,7 @@ namespace ScenarioBuilder.Demo.Editor
             camera.fieldOfView = 42f;
             camera.transform.SetPositionAndRotation(new Vector3(0f, 17f, -11.2f), Quaternion.Euler(57f, 0f, 0f));
             camera.gameObject.AddComponent<AudioListener>();
+            camera.gameObject.AddComponent<CameraAspectFit>();
 
             // Hover and press on 3D objects. Trigger zones sit on Ignore Raycast so they do not catch the mouse.
             camera.gameObject.AddComponent<PhysicsRaycaster>().eventMask = ~(1 << IgnoreRaycastLayer);
